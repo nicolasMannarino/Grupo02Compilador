@@ -71,7 +71,6 @@ Declaracion pilaDeclaracion[200];
 %token READ
 %token TIMER
 %token ESTACONTENIDO
-%token NUMERAL
 
 %%
 compOK:	
