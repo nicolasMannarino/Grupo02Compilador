@@ -26,6 +26,7 @@ DIGITO			[0-9]
 LETRA			[a-zA-Z]
 COMENTARIO		#\/([^\/]|\/+[^-])*\/#
 
+
 CTE_STRING		\"([^\"\\\\]|\\\\.)*\"
 CTE_FLOAT		({DIGITO}+"."{DIGITO}+)|("."{DIGITO}+)|({DIGITO}+".")
 CTE_INT			({DIGITO}+)|("-".{DIGITO}+)
@@ -52,6 +53,7 @@ MEN_O_IG        "<""="
 DISTINTO        "!""="
 IGUAL           "=""="
 RESTO           "%"
+NUMERAL         "#"
 
 
 %%
@@ -74,6 +76,7 @@ RESTO           "%"
 "OR"|"or"		{return OR;}
 "AND"|"and"		{return AND;}
 "!"				{return NEGADO;}
+
 
 {CTE_STRING}	{
 					char nombre[41];
@@ -157,9 +160,12 @@ RESTO           "%"
 {MEN_O_IG}		{return MEN_O_IG;}
 {DISTINTO}		{return DISTINTO;}
 {IGUAL}		    {return IGUAL;}
-{RESTO}		    {return RESTO;}
-{COMENTARIO}    
+{RESTO}		    {return RESTO;} 
+{NUMERAL}	    {return NUMERAL;}     
+{COMENTARIO}    {/* Ignorar comentarios */}
 
+
+[ \t\n\r\f\v]+    /* Ignorar espacios en blanco */
 "\n"      		
 "\t"
 "\n\t"
@@ -170,7 +176,7 @@ RESTO           "%"
 
 int yyerror(void)
 {
-	printf("\nError sintactico en la linea %d\n",yylineno-1);
+	printf("\nError sintactico en la linea %d\n",yylineno);
 	system ("Pause");
 	exit (1);
 }

@@ -71,6 +71,7 @@ Declaracion pilaDeclaracion[200];
 %token READ
 %token TIMER
 %token ESTACONTENIDO
+%token NUMERAL
 
 %%
 compOK:	
@@ -211,23 +212,20 @@ asignacion:
             ID OP_ASIG expresion				{printf("\nRegla 30 - Asignacion\n");}	
 			;
 
-listaexp: 	listaexp COMA expresion             {printf("\nRegla 31 - Lista de expresiones\n");}
-        	| expresion                        {printf("\nRegla 31 - Lista de expresiones\n");}
-			;
-
-listaconst:	listaconst P_Y_COMA CTE_INT       {printf("\nRegla 32 - Lista de constantes\n");}
-        	| CTE_INT                        {printf("\nRegla 32 - Lista de constante\n");}
-			;
-
 s_read:
-		READ P_ABRE ID	P_CIERRA					{printf("\nRegla 33 - READ\n");}
+		READ P_ABRE ID	P_CIERRA					{printf("\nRegla 31 - READ\n");}
 			;
 			
 s_write:
-		WRITE P_ABRE ID	P_CIERRA					        {printf("\nRegla 34 - WRITE\n");}	
-		|WRITE P_ABRE CTE_STRING P_CIERRA					{printf("\nRegla 34 - WRITE\n");}	
+		WRITE P_ABRE ID	P_CIERRA					        {printf("\nRegla 32 - WRITE\n");}	
+		|WRITE P_ABRE CTE_STRING P_CIERRA					{printf("\nRegla 32 - WRITE\n");}	
 		;
 
+timer:
+    TIMER P_ABRE CTE_INT COMA sentencia P_CIERRA {printf("\nRegla 33 - Funcion Timer\n");}
+
+esta_contenido:
+    ESTACONTENIDO P_ABRE CTE_STRING COMA CTE_STRING P_CIERRA
 
 
 expresion:
