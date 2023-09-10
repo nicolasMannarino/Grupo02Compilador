@@ -24,7 +24,7 @@ char errorMsg[100];
 
 DIGITO			[0-9]
 LETRA			[a-zA-Z]
-COMENTARIO		#\/([^\/]|\/+[^-])*\/#
+COMENTARIO		^#\/.+#$
 
 
 CTE_STRING		\"([^\"\\\\]|\\\\.)*\"
@@ -79,11 +79,11 @@ NUMERAL         "#"
 
 
 {CTE_STRING}	{
-					char nombre[31];
-					char valor[30];
+					char nombre[41];
+					char valor[40];
 					sprintf(nombre, "_%s", yytext);
-					if(strlen(yytext)> 32 ){
-						sprintf(errorMsg, "El String \"%s\" se excede del limite de 30 caracteres.\n", yytext);
+					if(strlen(yytext)> 42 ){
+						sprintf(errorMsg, "El String \"%s\" se excede del limite de 40 caracteres.\n", yytext);
 						errorLexico(errorMsg);
 					}else{
 						sprintf(valor, "%s", yytext);
