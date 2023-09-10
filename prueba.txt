@@ -1,4 +1,4 @@
-#/Prueba declaracion variables/#
+#/Prueba declaracion variables\#
 
 DECVAR
 a1,a2,a3,l1,l2,l3:INT
@@ -9,16 +9,16 @@ str1:STRING
 str2:STRING
 ENDDEC
 
-#/Prueba asignaciones/#
+#/Prueba asignaciones\#
 var1:=5
 var2:=5
 var3:=5
 
-#/Prueba READ y WRITE/#
+#/Prueba READ y WRITE\#
 READ (a1)
 WRITE ("hola")
 
-#/Prueba condiciones/#
+#/Prueba condiciones\#
 IF(a3==1)
 WRITE (a1)
 READ (a1)
@@ -61,10 +61,10 @@ a1:=4
 ELSE
 a1:=6
 ENDIF
-/#
-#/Comentario de prueba/#
 
-#/Prueba ciclo/#
+#/Comentario de prueba\#
+
+#/Prueba ciclo\#
 WHILE(J3 <= k4)
 J3:= k4
 k4:= J3
@@ -76,7 +76,7 @@ k4:= J3
 ENDWHILE
 
 
-#/Prueba ciclo y condiciones/#
+#/Prueba ciclo y condiciones\#
 WHILE(J3 <= k4)
 IF(a3==1)
 p1:=33.5
@@ -89,31 +89,31 @@ k4:= J3
 ENDWHILE
 
 
-#/Probando cota de enteros/#
-#/a1:=32767/#
+#/Probando cota de enteros\#
+#/a1:=32767\#
 a1:=32766
-#/a2:=-32768/#
+#/a2:=-32768\#
 a2:=-32767
 
-#/Probando cota de float/#
-#/p1:=0.00000000000000000000000000000000000001/#
+#/Probando cota de float\#
+#/p1:=0.00000000000000000000000000000000000001\#
 p1:=0.0000000000000000000000000000000000001
-#/p1:=350000000000000000000000000000000000000.0/#
+#/p1:=350000000000000000000000000000000000000.0\#
 p1:=340000000000000000000000000000000000000.0
 
 
-#/Probando cota de String/#
-#/str1:="Cadena que contiene mas caracteres de los permitidos"/#
+#/Probando cota de String\#
+#/str1:="Cadena que contiene mas caracteres de los permitidosaaaaaaaaaaaaaaaaaaaaaaaaaaa"\#
 str2:="Cadena correcta"
 
-#/Probando RESTO/#
+#/Probando RESTO\#
 a1 := a1%10
 
-#/Probando DIV/#
+#/Probando DIV\#
 a1 := a1/10
 
-#/Probando TIMER/#
+#/Probando TIMER\#
 Timer(5, WRITE ("Hello World"))
 
-#/Probando ESTACONTENIDO/#
+#/Probando ESTACONTENIDO\#
 EstaContenido("Homoplato", "plato")

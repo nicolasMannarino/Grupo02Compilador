@@ -24,8 +24,7 @@ char errorMsg[100];
 
 DIGITO			[0-9]
 LETRA			[a-zA-Z]
-COMENTARIO		#\/([^\/]|\/+[^-])*\/#
-
+COMENTARIO		^#\/.+#$
 
 CTE_STRING		\"([^\"\\\\]|\\\\.)*\"
 CTE_FLOAT		({DIGITO}+"."{DIGITO}+)|("."{DIGITO}+)|({DIGITO}+".")
@@ -161,8 +160,8 @@ NUMERAL         "#"
 {DISTINTO}		{return DISTINTO;}
 {IGUAL}		    {return IGUAL;}
 {RESTO}		    {return RESTO;} 
-{NUMERAL}	    {return NUMERAL;}     
-{COMENTARIO}    {/* Ignorar comentarios */}
+{NUMERAL}	      
+{COMENTARIO}    
 
 
 [ \t\n\r\f\v]+    /* Ignorar espacios en blanco */
