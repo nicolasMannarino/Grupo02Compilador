@@ -24,7 +24,7 @@ char errorMsg[100];
 
 DIGITO			[0-9]
 LETRA			[a-zA-Z]
-COMENTARIO		#\/([^\/]|\/+[^-])*\/#
+COMENTARIO		^#\/.+#$
 
 
 CTE_STRING		\"([^\"\\\\]|\\\\.)*\"
@@ -79,16 +79,15 @@ NUMERAL         "#"
 
 
 {CTE_STRING}	{
-					char nombre[41];
-					char valor[40];
-					sprintf(nombre, "_%d", atoi(yytext));
-					if(strlen(yytext)> 42 ){
-						sprintf(errorMsg, "El String \"%s\" se excede del limite de 40 caracteres.\n", yytext);
+					char nombre[31];
+					char valor[30];
+					sprintf(nombre, "_%s", yytext);
+					if(strlen(yytext)> 32 ){
+						sprintf(errorMsg, "El String \"%s\" se excede del limite de 30 caracteres.\n", yytext);
 						errorLexico(errorMsg);
 					}else{
 						sprintf(valor, "%s", yytext);
 					}
-					
 					if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, valor);
 					yylval = (int)yytext;
 					return CTE_STRING;
@@ -118,9 +117,8 @@ NUMERAL         "#"
 					}else{
 						char nombre[31];
 						char valor[30];
-						sprintf(nombre, "_%d", atoi(yytext));
-						sprintf(valor, "%d", atoi(yytext));
-				
+						sprintf(nombre, "_%.2f", atof(yytext));
+						sprintf(valor, "%.2f", atof(yytext));
 					if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, valor);
 					}
 					yylval = (int)yytext;

@@ -21,6 +21,8 @@ int ultimo=0;
 int insertarEnTabla(char *nombre, char *valor){
 	if(ultimo == TAM_TS)
 		return -1;
+  //printf("nombre %s", nombre);
+  //printf("valor %s", valor);
 	
 	strncpy(ts[ultimo].nombre, nombre, TAM_LEXEMA + 1);
 	strncpy(ts[ultimo].valor, valor, 40);
@@ -68,8 +70,8 @@ void imprimirTabla()
   printf("\n\n");
   printf("Cantidad de elementos: %d\n", getCountTS());
   
-  printf("-----------------------------------TABLA DE SIMBOLOS------------------------------------|\n");
-  printf("       NOMBRE      |        TIPO        |              VALOR              |  LONGITUD   |\n");
+  printf("------------------------------------TABLA DE SIMBOLOS-----------------------------------|\n");
+  printf("       NOMBRE       |        TIPO        |              VALOR             |  LONGITUD   |\n");
   printf("----------------------------------------------------------------------------------------|\n");
 
   size_t i;
@@ -80,7 +82,7 @@ void imprimirTabla()
     char linea[ 1024 ];
     memset( linea, 0, sizeof( linea ) );
 
-    sprintf(linea, " %-*s | %-*s | %*s | %*s |\n", 17, sim->nombre,
+    sprintf(linea, " %-*s | %-*s | %*s | %*s |\n", 18, sim->nombre,
                                                  18, "",
                                                  31, sim->valor,
                                                  11, "");
@@ -94,18 +96,18 @@ void generarArchivo()
 {
   FILE *fp;
   
-  fp = fopen ( "ts.txt", "w+" );
+  fp = fopen ( "symbol-table.txt", "w+" );
   
-  fprintf(fp,"-----------------------------------TABLA DE SIMBOLOS------------------------------------|\n");
-  fprintf(fp,"       NOMBRE      |        TIPO        |              VALOR              |  LONGITUD   |\n");
-  fprintf(fp,"----------------------------------------------------------------------------------------|\n");
+  fprintf(fp,"------------------------------------TABLA DE SIMBOLOS------------------------------------|\n");
+  fprintf(fp,"       NOMBRE       |        TIPO        |              VALOR              |  LONGITUD   |\n");
+  fprintf(fp,"-----------------------------------------------------------------------------------------|\n");
 
   size_t i;
   for(i = 0; i < getCountTS(); i++)
   {
     simbolo *sim = &ts[i];
 
-    fprintf(fp, " %-*s | %-*s | %*s | %*s |\n", 17, sim->nombre,
+  fprintf(fp, " %-*s | %-*s | %*s | %*s |\n", 18, sim->nombre,
                                                  18, "",
                                                  31, sim->valor,
                                                  11, "");

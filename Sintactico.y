@@ -229,23 +229,23 @@ esta_contenido:
 
 
 expresion:
-         termino							{printf("\nRegla 40 - Expresion\n");}
-	     |expresion OP_SUM termino			{printf("\nRegla 41 - Expresion suma\n");}
-         |expresion OP_RES termino			{printf("\nRegla 42 - Expresion resta\n");}
-		 |expresion RESTO termino			{printf("\nRegla 43 - Expresion resto\n");}					
+         termino							{printf("\nRegla 34 - Expresion\n");}
+	     |expresion OP_SUM termino			{printf("\nRegla 35 - Expresion suma\n");}
+         |expresion OP_RES termino			{printf("\nRegla 36 - Expresion resta\n");}
+		 |expresion RESTO termino			{printf("\nRegla 37 - Expresion resto\n");}					
 		 ;
 
 termino: 
-       factor								{printf("\nRegla 44 - Termino \n");}
-       |termino OP_DIV factor				{printf("\nRegla 45 - Termino division\n");}
-       |termino OP_MUL factor				{printf("\nRegla 46 - termino multiplicacion\n");}
+       factor								{printf("\nRegla 38 - Termino \n");}
+       |termino OP_DIV factor				{printf("\nRegla 39 - Termino division\n");}
+       |termino OP_MUL factor				{printf("\nRegla 40 - termino multiplicacion\n");}
        ;	
 
 factor: 
-      ID 									{printf("\nRegla 47 - Factor ID \n");}
-      | CTE_INT 							{printf("\nRegla 48 - Factor CTE_INT \n");}
-      | CTE_FLOAT 							{printf("\nRegla 59 - Factor CTE_FLOAT \n");}
-	  | CTE_STRING							{printf("\nRegla 60 - Factor CTE_STRING \n");}
+      ID 									{printf("\nRegla 41 - Factor ID \n");}
+      | CTE_INT 							{printf("\nRegla 42 - Factor CTE_INT \n");}
+      | CTE_FLOAT 							{printf("\nRegla 43 - Factor CTE_FLOAT \n");}
+	  | CTE_STRING							{printf("\nRegla 44 - Factor CTE_STRING \n");}
       ;
 
 %%
