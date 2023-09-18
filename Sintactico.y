@@ -185,7 +185,6 @@ iterador:
 																					}																		
 			;
 			
-
 condicion:			
 			factor MENOR factor															{ 	
 																						printf("Regla 24 - Comparacion menor \n");

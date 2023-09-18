@@ -162,7 +162,6 @@ NUMERAL         "#"
 {NUMERAL}	      
 {COMENTARIO}    
 
-
 [ \t\n\r\f\v]+    /* Ignorar espacios en blanco */
 "\n"      		
 "\t"

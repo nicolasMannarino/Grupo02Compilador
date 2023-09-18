@@ -12,7 +12,7 @@ typedef struct simbolo {
 	char nombre[TAM_LEXEMA + 1];
  	char tipoDato[31];
  	char valor[40];
- 	char longitud[31];
+ 	char longitud[41];
 } simbolo;
 
 simbolo ts[TAM_TS];
