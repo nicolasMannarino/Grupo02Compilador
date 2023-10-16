@@ -85,10 +85,9 @@ NUMERAL         "#"
 					}else{
 						sprintf(valor, "%s", yytext);
 					}
-					if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, valor);
+					if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, "CTE_STRING", valor, (int)strlen(yytext));
 					yylval = (int)yytext;
 					return CTE_STRING;
-
                 }
 
 {CTE_INT}		{
@@ -101,7 +100,7 @@ NUMERAL         "#"
 						sprintf(nombre, "_%d", atoi(yytext));
 						sprintf(valor, "%d", atoi(yytext));
 					
-						if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, valor);
+						if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, "CTE_INT", valor, (int)strlen(yytext));
 					}
 					yylval = (int)yytext;
 					return CTE_INT;
@@ -116,7 +115,7 @@ NUMERAL         "#"
 						char valor[30];
 						sprintf(nombre, "_%.2f", atof(yytext));
 						sprintf(valor, "%.2f", atof(yytext));
-					if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, valor);
+					if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, "CTE_FLOAT", valor, (int)strlen(yytext));
 					}
 					yylval = (int)yytext;
 					return CTE_FLOAT;
@@ -129,7 +128,7 @@ NUMERAL         "#"
 					sprintf(nombre, "_%d", atoi(yytext));
 					sprintf(valor, "%d", atoi(yytext));
 					
-					if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, valor);
+					if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, "", valor, "");
 					yylval = (int)yytext;
 					return ID;
                 }

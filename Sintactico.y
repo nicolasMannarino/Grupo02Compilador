@@ -7,9 +7,10 @@
 #include <float.h>
 #include <limits.h>
 
+
 #include "y.tab.h"
 #include "TablaSimbolos.h"
-
+#include "tercetos.h"
 
 int yystopparser=0;
 FILE  *yyin;
@@ -25,6 +26,24 @@ typedef struct Declaracion {
 } Declaracion;
 Declaracion pilaDeclaracion[200];
 
+char idAsignar[TAM_LEXEMA];
+
+int ind_programa;
+int ind_sentencia;
+int ind_decvar;
+int ind_tipo_dato;
+int ind_id;
+int ind_decision;
+int ind_interador;
+int ind_condicion;
+int ind_asignacion;
+int ind_listaexp;
+int ind_listaconst;
+int ind_read;
+int ind_write;
+int ind_expresion;
+int ind_termino;
+int ind_factor;
 
 %}
 
@@ -73,6 +92,7 @@ Declaracion pilaDeclaracion[200];
 compOK:	
 			programa																{	
 																						printf("Regla 0 - Compilacion OK\n");	
+																						guardarTercetos();
 																					}
 			;
 programa: 
@@ -112,24 +132,27 @@ sentencia:
 declaracion_variables:			
 						identificadores DOS_PUNTOS tipo_dato						{ 
 																						printf("Regla 9 - Declaracion de variables \n");
-																						insertarVariables(pilaDeclaracion, ult);
+																						insertarVariables(pilaDeclaracion, tipoDato, ult);
 																					}
 																		
 						|declaracion_variables identificadores DOS_PUNTOS tipo_dato {   
 																						printf("Regla 9 - Declaracion de variables \n");
-																						insertarVariables(pilaDeclaracion, ult);
+																						insertarVariables(pilaDeclaracion, tipoDato, ult);
 																					}
 						;                 
 
 tipo_dato: 
 		INT																			{	
 																						printf("Regla 10 - Tipo dato int\n"); 
+																						strncpy(tipoDato, "INT", 31);
 																					}
 		|STRING																		{	
 																						printf("Regla 11 - Tipo dato cadena\n");
+																						strncpy(tipoDato, "STRING", 31);
 																					}
 		|FLOAT																		{	
 																						printf("Regla 12 - Tipo dato float\n"); 
+																						strncpy(tipoDato, "FLOAT", 31);
 																					}
 		;			
 					
@@ -205,7 +228,10 @@ condicion:
 			;			
 			
 asignacion:
-            ID OP_ASIG expresion				{printf("\nRegla 30 - Asignacion\n");}	
+            ID {strcpy(idAsignar, $1);} OP_ASIG expresion				{printf("\nRegla 30 - Asignacion\n");	
+																		int pos = buscarEnTabla(idAsignar);
+																		ind_asignacion = crear_terceto(OP_ASIG,pos,ind_expresion);
+																		}	
 			;
 
 s_read:
@@ -225,34 +251,65 @@ esta_contenido:
 
 
 expresion:
-         termino							{printf("\nRegla 34 - Expresion\n");}
-	     |expresion OP_SUM termino			{printf("\nRegla 35 - Expresion suma\n");}
-         |expresion OP_RES termino			{printf("\nRegla 36 - Expresion resta\n");}
-		 |expresion RESTO termino			{printf("\nRegla 37 - Expresion resto\n");}					
+         termino							{printf("\nRegla 34 - Expresion\n");
+		 									 ind_expresion = ind_termino;}
+	     |expresion OP_SUM termino			{printf("\nRegla 35 - Expresion suma\n");
+		 									 ind_expresion = crear_terceto(OP_SUM,ind_expresion,ind_termino);
+											 }
+         |expresion OP_RES termino			{printf("\nRegla 36 - Expresion resta\n");
+		 									ind_expresion = crear_terceto(OP_RES,ind_expresion,ind_termino);
+											 }
+		 |expresion RESTO termino			{printf("\nRegla 37 - Expresion resto\n");
+		 									ind_expresion = crear_terceto(RESTO,ind_expresion,ind_termino);
+											 }				
 		 ;
 
 termino: 
-       factor								{printf("\nRegla 38 - Termino \n");}
-       |termino OP_DIV factor				{printf("\nRegla 39 - Termino division\n");}
-       |termino OP_MUL factor				{printf("\nRegla 40 - termino multiplicacion\n");}
+       factor								{printf("\nRegla 38 - Termino \n");
+	   										 ind_termino = ind_factor;
+											}
+       |termino OP_DIV factor				{printf("\nRegla 39 - Termino division\n");
+	   										 ind_termino = crear_terceto(OP_DIV,ind_termino,ind_factor);
+											   }
+       |termino OP_MUL factor				{printf("\nRegla 40 - termino multiplicacion\n");
+	   										 ind_termino = crear_terceto(OP_MUL,ind_termino,ind_factor);
+											   }
        ;	
 
 factor: 
-      ID 									{printf("\nRegla 41 - Factor ID \n");}
-      | CTE_INT 							{printf("\nRegla 42 - Factor CTE_INT \n");}
-      | CTE_FLOAT 							{printf("\nRegla 43 - Factor CTE_FLOAT \n");}
-	  | CTE_STRING							{printf("\nRegla 44 - Factor CTE_STRING \n");}
+      ID 									{printf("\nRegla 41 - Factor ID \n");
+	  										printf("\nnombre ID %s\n", $1);
+	  										int pos = buscarEnTabla($1);
+	  										ind_factor = crear_terceto(NOOP,pos,NOOP);}
+      | CTE_INT 							{printf("\nRegla 42 - Factor CTE_INT \n");
+	  										char nombre[31];
+											sprintf(nombre, "_%s", $1);  
+	  										int pos = buscarEnTabla(nombre);
+	  										ind_factor = crear_terceto(NOOP,pos,NOOP);}
+      | CTE_FLOAT 							{printf("\nRegla 43 - Factor CTE_FLOAT \n");
+	  										char nombre[31];
+											sprintf(nombre, "_%f", $1);  
+											printf("\nnombre cte float %f\n", $1);
+	  										int pos = buscarEnTabla(nombre);
+											ind_factor = crear_terceto(NOOP,pos,NOOP);}
+	  | CTE_STRING							{printf("\nRegla 44 - Factor CTE_STRING \n");
+	  										char nombre[31];
+											sprintf(nombre, "_%s", $1);
+	  										int pos = buscarEnTabla(nombre);
+	  										ind_factor = crear_terceto(NOOP,pos,NOOP);}
       ;
 
 %%
 
 
-int insertarVariables(Declaracion *pilaDeclaracion, int cantidad) {
+int insertarVariables(Declaracion *pilaDeclaracion, char *tipoD, int cantidad) {
 	int i = 0;
+
+	strncpy(tipoDato, tipoD, 31);
 	
 	for(i = 0; i < cantidad; i++) {
 		//printf("%s ", pilaDeclaracion[i].nombreDato);
-		insertarEnTabla(pilaDeclaracion[i].nombreDato, "");
+		insertarEnTabla(pilaDeclaracion[i].nombreDato, tipoDato, "", 0);
 	}
 	return i;
 }
