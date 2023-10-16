@@ -58,17 +58,14 @@ NUMERAL         "#"
 
 %%
 
-"DECVAR"		{return DECVAR;}
-"ENDDEC"		{return ENDDEC;}
+"INIT"		{return INIT;}
 "INT"			{return INT;}
 "FLOAT"			{return FLOAT;}
 "STRING"		{return STRING;}
 
 "IF"		    {return IF;}
 "ELSE"			{return ELSE;}
-"ENDIF"			{return ENDIF;}
-"WHILE"			{return WHILE;}
-"ENDWHILE"		{return ENDWHILE;}
+"CICLO"			{return CICLO;}
 "WRITE"			{return WRITE;}
 "READ"			{return READ;}
 "TIMER"|"Timer"         {return TIMER;}
@@ -161,6 +158,7 @@ NUMERAL         "#"
 {RESTO}		    {return RESTO;} 
 {NUMERAL}	      
 {COMENTARIO}    
+
 
 [ \t\n\r\f\v]+    /* Ignorar espacios en blanco */
 "\n"      		

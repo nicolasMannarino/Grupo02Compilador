@@ -1,12 +1,14 @@
 #/Prueba declaracion variables\#
-DECVAR
+INIT
+{
 a1,a2,a3,l1,l2,l3,r1:INT
 p1:FLOAT
 J3,k4:FLOAT
 var1,var2,var3:INT
 str1:STRING
 str2:STRING
-ENDDEC
+}
+
 
 #/Prueba asignaciones\#
 var1:=5
@@ -19,74 +21,109 @@ WRITE ("hola")
 
 #/Prueba condiciones\#
 IF(a3==1)
-WRITE (a1)
-READ (a1)
-READ (a1)
-IF(a2==4)
-a:=4
-ELSE
-a:=3
-ENDIF
-a1:=2
-ENDIF
+{
+    WRITE (a1)
+
+    READ (a1)
+    READ (a1)
+    IF(a2==4)
+    {
+        a:=4
+    }
+    ELSE
+    {
+        a:=3
+    }
+
+
+    a1:=2
+}
 
 IF(a1>a2 or a1!=10)
-a1:=2
-a2:=2
-ENDIF
+{
+    a1:=2
+    a2:=2
+}
+
+
 
 IF(a1>a2 or a1!=10)
-a1:=2
+{
+    a1:=2
+}
 ELSE
-a2:=2
-ENDIF
+{
+    a2:=2
+}
+
+
 
 IF(a1>a2 AND a1!=10)
-a1:=4
-ENDIF
+{
+    a1:=4
+}
 
 IF(a1>a2 AND a1!=10)
-a1:=4
+{
+    a1:=4
+}
 ELSE
-a1:=2
-ENDIF
+{
+    a1:=2
+}
+
 
 IF(!a1>a2)
-a1:=4
-ENDIF
+{
+    a1:=4
+}
+
 
 IF(!a1>a2)
-a1:=4
+{
+    a1:=4
+}
 ELSE
-a1:=6
-ENDIF
+{
+    a1:=6
+}
 
 #/Comentario de prueba\#
 #/Comentario #/de\# prueba\#
 
 #/Prueba ciclo\#
-WHILE(J3 <= k4)
-J3:= k4
-k4:= J3
-ENDWHILE
+CICLO(J3 <= k4)
+{
+    J3:= k4
+    k4:= J3
+}
 
-WHILE(!J3 <= k4)
-J3:= k4
-k4:= J3
-ENDWHILE
+CICLO(!J3 <= k4)
+{
+    J3:= k4
+    k4:= J3
+}
+
 
 
 #/Prueba ciclo y condiciones\#
-WHILE(J3 <= k4)
+CICLO(J3 <= k4)
+{
 IF(a3==1)
-p1:=33.5
-ENDIF
+{
+    p1:=33.5
+}
+
 IF(a2==588)
-p1:=100
-ENDIF
+{
+    p1:=100
+}
+
 J3:= k4
 k4:= J3
-ENDWHILE
+}
+
+
 
 
 #/Probando cota de enteros\#

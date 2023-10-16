@@ -54,19 +54,16 @@ Declaracion pilaDeclaracion[200];
 %token DISTINTO
 %token IGUAL
 %token NEGADO
+%token INIT
 %token AND
 %token OR
 %token RESTO
-%token DECVAR
-%token ENDDEC
 %token INT
 %token FLOAT
 %token STRING
 %token IF
 %token ELSE
-%token ENDIF
-%token WHILE
-%token ENDWHILE
+%token CICLO
 %token WRITE
 %token READ
 %token TIMER
@@ -87,7 +84,7 @@ programa:
 																					}
 			;			
 sentencia:			
-            DECVAR {printf ("Inicia declaracion \n");} declaracion_variables ENDDEC {printf("Fin declaracion \n");}			
+            INIT LL_ABRE {printf ("Inicia declaracion \n");} declaracion_variables LL_CIERRA {printf("Fin declaracion \n");}			
 			
 			|decision 																{ 	
 																						printf("Regla 2 - Sentencia decision \n"); 
@@ -150,41 +147,42 @@ identificadores:
 			;			
 
 decision:			
-			IF P_ABRE condicion AND condicion P_CIERRA programa ENDIF		{ 	
+			IF P_ABRE condicion AND condicion P_CIERRA LL_ABRE programa LL_CIERRA 		{ 	
 																								printf("Regla 14 - IF con AND \n");
 																							}
-			|IF P_ABRE condicion AND condicion P_CIERRA programa ELSE programa ENDIF		{ 	
+			|IF P_ABRE condicion AND condicion P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 		{ 	
 																								printf("Regla 15 - IF con AND y ELSE \n");
 																							}																				
-			|IF P_ABRE condicion OR condicion P_CIERRA programa ENDIF		{ 	
+			|IF P_ABRE condicion OR condicion P_CIERRA LL_ABRE programa LL_CIERRA 		{ 	
 																								printf("Regla 16 - IF con OR \n");
 																							}
-			|IF P_ABRE condicion OR condicion P_CIERRA programa ELSE programa ENDIF		{ 	
+			|IF P_ABRE condicion OR condicion P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 		{ 	
 																								printf("Regla 17 - IF con OR y ELSE \n");
 																							}																				
-			|IF P_ABRE condicion P_CIERRA programa ENDIF					{ 	
+			|IF P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA 					{ 	
 																						printf("Regla 18 - IF \n");
 																					}
-			|IF P_ABRE condicion P_CIERRA programa ELSE programa ENDIF	{ 
+			|IF P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 	{ 
 																						printf("Regla 19 - IF con ELSE \n");
 																					}	
-			|IF P_ABRE NEGADO condicion P_CIERRA programa ENDIF		{ 	
+			|IF P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa  LL_CIERRA		{ 	
 																						printf("Regla 20 - IF negado \n");
 																					}																			
-			|IF P_ABRE NEGADO condicion P_CIERRA programa ELSE programa ENDIF		{ 	
+			|IF P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 		{ 	
 																						printf("Regla 21 - IF negado con ELSE\n");
 																					}																																	
 			;	
 
 iterador:
-			WHILE P_ABRE condicion P_CIERRA programa ENDWHILE					{
-																						printf("Regla 22 - WHILE\n");
+			CICLO P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA					{
+																						printf("Regla 22 - CICLO\n");
 																					}
-			|WHILE P_ABRE NEGADO condicion P_CIERRA programa ENDWHILE			{
-																						printf("Regla 23 - WHILE NEGADO\n");
+			|CICLO P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA			{
+																						printf("Regla 23 - CICLO NEGADO\n");
 																					}																		
 			;
 			
+
 condicion:			
 			factor MENOR factor															{ 	
 																						printf("Regla 24 - Comparacion menor \n");
