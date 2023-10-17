@@ -79,7 +79,7 @@ void guardarTercetos(){
 	if(ultimo_terceto == -1)
 		yyerror("No encontre los tercetos");
 
-	FILE* arch = fopen("intermedia.txt", "w+");
+	FILE* arch = fopen("intermediate-code.txt", "w+");
 	if(!arch){
 		printf("No pude crear el archivo intermedia.txt\n");
 		return;

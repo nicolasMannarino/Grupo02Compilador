@@ -100,7 +100,9 @@ NUMERAL         "#"
 						sprintf(nombre, "_%d", atoi(yytext));
 						sprintf(valor, "%d", atoi(yytext));
 					
-						if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, "CTE_INT", valor, (int)strlen(yytext));
+						if(buscarEnTabla(nombre) == -1) {
+							insertarEnTabla(nombre, "CTE_INT", valor, (int)strlen(yytext));
+						}
 					}
 					yylval = (int)yytext;
 					return CTE_INT;

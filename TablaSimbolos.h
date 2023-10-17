@@ -134,7 +134,7 @@ void generarArchivo()
 {
   FILE *fp;
   
-  fp = fopen ( "ts.txt", "w+" );
+  fp = fopen ( "symbol-table.txt", "w+" );
   
   fprintf(fp,"----------------------------------------TABLA DE SIMBOLOS------------------------------------|\n");
   fprintf(fp,"       NOMBRE           |        TIPO        |              VALOR              |  LONGITUD   |\n");
