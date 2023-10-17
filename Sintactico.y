@@ -309,7 +309,8 @@ int insertarVariables(Declaracion *pilaDeclaracion, char *tipoD, int cantidad) {
 	
 	for(i = 0; i < cantidad; i++) {
 		//printf("%s ", pilaDeclaracion[i].nombreDato);
-		insertarEnTabla(pilaDeclaracion[i].nombreDato, tipoDato, "", 0);
+		if(buscarEnTabla(pilaDeclaracion[i].nombreDato) == -1)
+			insertarEnTabla(pilaDeclaracion[i].nombreDato, tipoDato, "", 0);
 	}
 	return i;
 }

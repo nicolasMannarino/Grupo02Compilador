@@ -7,6 +7,7 @@ J3,k4:FLOAT
 var1,var2,var3:INT
 str1:STRING
 str2:STRING
+str2:STRING
 }
 
 
