@@ -1,9 +1,14 @@
-
 #include "TablaSimbolos.h"
 
 
 #define OFFSET TAM_TS
 #define MAX_TERCETOS 512
+#define MAX_TAMANO_PILA 100
+
+typedef struct {
+    int datos[MAX_TAMANO_PILA];
+    int cima;
+} Pila;
 
 /* Operadores extra para usar con los tokens */
 #define NOOP -1 /* Sin operador */
@@ -25,6 +30,15 @@
 #define OP1 2
 #define OP2 3
 #define OPERADOR 1
+
+
+/* Funciones */
+void apilar(Pila*, int );
+int desapilar(Pila*);
+void inicializarPila(Pila*);
+int crear_terceto(int operador, int op1, int op2);
+void guardarTercetos();
+void modificarTerceto(int indice, int posicion, int valor);
 
 typedef struct{
   int operador;
@@ -170,6 +184,9 @@ void guardarTercetos(){
 		case WRITE:
 			fprintf(arch, "mostrame");
 			break;
+		case RESTO:
+			fprintf(arch, "%");
+			break;
 		case CMP:
 			fprintf(arch, "CMP");
 			break;
@@ -230,4 +247,47 @@ void guardarTercetos(){
 		fprintf(arch, ")\n");
 	}
 	fclose(arch);
+}
+
+int saltarFalse(int comp){
+	switch(comp){
+	case MAYOR:
+		return BLE;
+	case MAY_O_IG:
+		return BLT;
+	case MENOR:
+		return BGE;
+	case MEN_O_IG:
+		return BGT;
+	case IGUAL:
+		return BNE;
+	case DISTINTO:
+		return BEQ;
+	}
+	return NOOP;
+}
+
+// Función para inicializar una pila
+void inicializarPila(Pila *pila) {
+    pila->cima = -1; // Inicializa la cima de la pila
+}
+
+// Función para apilar un elemento en la pila
+void apilar(Pila *pila, int valor) {
+    if (pila->cima < MAX_TAMANO_PILA - 1) {
+        pila->datos[++pila->cima] = valor;
+    } else {
+        printf("La pila está llena. No se pueden apilar más elementos.\n");
+		return;
+    }
+}
+
+// Función para desapilar un elemento de la pila
+int desapilar(Pila *pila) {
+    if (pila->cima >= 0) {
+        return pila->datos[pila->cima--];
+    } else {
+        printf("La pila está vacía. No se pueden desapilar más elementos.\n");
+        return -1; // Valor para indicar un error o pila vacía
+    }
 }

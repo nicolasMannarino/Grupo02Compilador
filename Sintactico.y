@@ -28,6 +28,9 @@ Declaracion pilaDeclaracion[200];
 
 char idAsignar[TAM_LEXEMA];
 
+/* Cosas para comparadores booleanos */
+	int comp_bool_actual;
+
 int ind_programa;
 int ind_sentencia;
 int ind_decvar;
@@ -44,6 +47,9 @@ int ind_write;
 int ind_expresion;
 int ind_termino;
 int ind_factor;
+int ind_factorDer;
+int ind_factorIzq;
+
 
 %}
 
@@ -197,102 +203,102 @@ decision:
 			;	
 
 iterador:
-			CICLO P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA					{
-																						printf("Regla 22 - CICLO\n");
-																					}
-			|CICLO P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA			{
-																						printf("Regla 23 - CICLO NEGADO\n");
-																					}																		
+			CICLO P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA					{printf("Regla 22 - CICLO\n");}
+			|CICLO P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA			{printf("Regla 23 - CICLO NEGADO\n");}																		
 			;
 			
 
 condicion:			
-			factor MENOR factor															{ 	
-																						printf("Regla 24 - Comparacion menor \n");
-																					}
-			|factor MAYOR factor															{ 
-																						printf("Regla 25 - Comparacion mayor \n");
-																					}
-			|factor MAY_O_IG factor														{ 
-																						printf("Regla 26 - Comparacion mayor o igual \n");
-																					}
-			|factor MEN_O_IG factor														{ 
-																						printf("Regla 27 - Comparacion menor o igual \n");
-																					}
-			|factor DISTINTO factor													{ 
-																						printf("Regla 28 - Comparacion distinto \n");
-																					}
-			|factor IGUAL factor													{ 
-																						printf("Regla 29 - Comparacion igual \n");
-																					}
-			;			
-			
+			factorIzq comp_bool factorDer													{printf("Regla 24 - Comparacion menor \n");
+																							ind_condicion = crear_terceto(CMP,ind_factorIzq,ind_factorDer);
+																							crear_terceto(saltarFalse(comp_bool_actual),NOOP,NOOP);};			
+
+factorIzq:
+		factor 																		{printf("Regla 25- Factor Izq \n");
+																					ind_factorIzq = ind_factor;}
+
+factorDer:
+		factor																		{printf("Regla 26 - Factor Der \n");
+																					ind_factorDer = ind_factor;}
+
+comp_bool:
+    MENOR                                               {printf("Regla 27: comp_bool es MENOR\n");
+														comp_bool_actual = MENOR;}
+    |MAYOR                                              {printf("Regla 28: comp_bool es MAYOR\n");
+														comp_bool_actual = MAYOR;}
+    |MEN_O_IG                                       	{printf("Regla 29: comp_bool es MEN_O_IG\n");
+														comp_bool_actual = MEN_O_IG;}
+    |MAY_O_IG                                           {printf("Regla 30: comp_bool es MAY_O_IG\n");
+														comp_bool_actual = MAY_O_IG;}
+    |IGUAL                                              {printf("Regla 31: comp_bool es IGUAL\n");
+														comp_bool_actual = IGUAL;}
+    |DISTINTO                                           {printf("Regla 32: comp_bool es DISTINTO\n");
+														comp_bool_actual = DISTINTO;};
+
 asignacion:
-            ID {strcpy(idAsignar, $1);} OP_ASIG expresion				{printf("\nRegla 30 - Asignacion\n");	
+            ID {strcpy(idAsignar, $1);} OP_ASIG expresion				{printf("\nRegla 33 - Asignacion\n");	
 																		int pos = buscarEnTabla(idAsignar);
 																		ind_asignacion = crear_terceto(OP_ASIG,pos,ind_expresion);
 																		}	
 			;
 
 s_read:
-		READ P_ABRE ID	P_CIERRA					{printf("\nRegla 31 - READ\n");}
-			;
+		READ P_ABRE ID	P_CIERRA					{printf("\nRegla 34 - READ\n");};
 			
 s_write:
-		WRITE P_ABRE ID	P_CIERRA					        {printf("\nRegla 32 - WRITE\n");}	
-		|WRITE P_ABRE CTE_STRING P_CIERRA					{printf("\nRegla 32 - WRITE\n");}	
-		;
+		WRITE P_ABRE ID	P_CIERRA					        {printf("\nRegla 35 - WRITE\n");}	
+		|WRITE P_ABRE CTE_STRING P_CIERRA					{printf("\nRegla 35 - WRITE\n");};
 
 timer:
-    TIMER P_ABRE CTE_INT COMA sentencia P_CIERRA {printf("\nRegla 33 - Funcion Timer\n");}
+    TIMER P_ABRE CTE_INT COMA sentencia P_CIERRA {printf("\nRegla 36 - Funcion Timer\n");}
 
 esta_contenido:
-    ESTACONTENIDO P_ABRE CTE_STRING COMA CTE_STRING P_CIERRA
+    ESTACONTENIDO P_ABRE CTE_STRING COMA CTE_STRING P_CIERRA {printf("\nRegla 37 - Funcion ESTACONTENIDO\n");}
 
 
 expresion:
-         termino							{printf("\nRegla 34 - Expresion\n");
+         termino							{printf("\nRegla 38 - Expresion\n");
 		 									 ind_expresion = ind_termino;}
-	     |expresion OP_SUM termino			{printf("\nRegla 35 - Expresion suma\n");
+	     |expresion OP_SUM termino			{printf("\nRegla 39 - Expresion suma\n");
 		 									 ind_expresion = crear_terceto(OP_SUM,ind_expresion,ind_termino);
 											 }
-         |expresion OP_RES termino			{printf("\nRegla 36 - Expresion resta\n");
+         |expresion OP_RES termino			{printf("\nRegla 40 - Expresion resta\n");
 		 									ind_expresion = crear_terceto(OP_RES,ind_expresion,ind_termino);
 											 }
-		 |expresion RESTO termino			{printf("\nRegla 37 - Expresion resto\n");
+		 |expresion RESTO termino			{printf("\nRegla 41 - Expresion resto\n");
 		 									ind_expresion = crear_terceto(RESTO,ind_expresion,ind_termino);
 											 }				
 		 ;
 
 termino: 
-       factor								{printf("\nRegla 38 - Termino \n");
+       factor								{printf("\nRegla 42 - Termino \n");
 	   										 ind_termino = ind_factor;
 											}
-       |termino OP_DIV factor				{printf("\nRegla 39 - Termino division\n");
+       |termino OP_DIV factor				{printf("\nRegla 43 - Termino division\n");
 	   										 ind_termino = crear_terceto(OP_DIV,ind_termino,ind_factor);
 											   }
-       |termino OP_MUL factor				{printf("\nRegla 40 - termino multiplicacion\n");
+       |termino OP_MUL factor				{printf("\nRegla 44 - termino multiplicacion\n");
 	   										 ind_termino = crear_terceto(OP_MUL,ind_termino,ind_factor);
-											   }
+											}
        ;	
 
 factor: 
-      ID 									{printf("\nRegla 41 - Factor ID \n");
+      ID 									{printf("\nRegla 45 - Factor ID \n");
 	  										printf("\nnombre ID %s\n", $1);
 	  										int pos = buscarEnTabla($1);
 	  										ind_factor = crear_terceto(NOOP,pos,NOOP);}
-      | CTE_INT 							{printf("\nRegla 42 - Factor CTE_INT \n");
+      | CTE_INT 							{printf("\nRegla 46 - Factor CTE_INT \n");
 	  										char nombre[31];
 											sprintf(nombre, "_%s", $1);  
 	  										int pos = buscarEnTabla(nombre);
 	  										ind_factor = crear_terceto(NOOP,pos,NOOP);}
-      | CTE_FLOAT 							{printf("\nRegla 43 - Factor CTE_FLOAT \n");
+      | CTE_FLOAT 							{printf("\nRegla 47 - Factor CTE_FLOAT \n");
 	  										char nombre[31];
 											sprintf(nombre, "_%f", $1);  
 											printf("\nnombre cte float %f\n", $1);
 	  										int pos = buscarEnTabla(nombre);
 											ind_factor = crear_terceto(NOOP,pos,NOOP);}
-	  | CTE_STRING							{printf("\nRegla 44 - Factor CTE_STRING \n");
+	  | CTE_STRING							{printf("\nRegla 48 - Factor CTE_STRING \n");
 	  										char nombre[31];
 											sprintf(nombre, "_%s", $1);
 	  										int pos = buscarEnTabla(nombre);
