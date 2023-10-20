@@ -5,11 +5,15 @@
 #define MAX_TERCETOS 512
 #define MAX_TAMANO_PILA 100
 
-typedef struct {
-    int datos[MAX_TAMANO_PILA];
-    int cima;
-} Pila;
 
+typedef struct f_nodo
+{
+    struct f_nodo* ant;
+    char dato[200];
+    int nro;
+}r_nodo;
+
+typedef r_nodo* t_pila;
 /* Operadores extra para usar con los tokens */
 #define NOOP -1 /* Sin operador */
 #define BLOQ 7  /* Operador que indica el orden de las sentencias */
@@ -20,11 +24,8 @@ typedef struct {
 #define BLE 10  /* > */
 #define BEQ 14  /* != */
 #define BGT 8   /* <= */
-#define JMP 16  /* Branch Always o Salto Incondicional*/
-#define INL 18  /* Un terceto con este operador representa el resultado del inlist.
-                /* Representa la comparacion de dos numeros iguales si dio verdadero
-                * o de dos numeros distintos si dio falso.
-                */
+#define BI 16  /* Branch Always o Salto Incondicional*/
+
 
 /* Posiciones dentro de un terceto */
 #define OP1 2
@@ -33,9 +34,18 @@ typedef struct {
 
 
 /* Funciones */
-void apilar(Pila*, int );
-int desapilar(Pila*);
-void inicializarPila(Pila*);
+
+void crear_pila(t_pila*);
+int apilar(t_pila*,char*);
+int desapilar(t_pila*,char*);
+int pila_vacia(t_pila*);
+void vaciar_pila(t_pila*);
+int apilarTODO(t_pila*, char*, int);
+int verTope(t_pila *, char *);
+int verTopeEntero(t_pila* );
+int apilarEntero(t_pila* p,int d);
+int desapilarEntero(t_pila* p);
+
 int crear_terceto(int operador, int op1, int op2);
 void guardarTercetos();
 void modificarTerceto(int indice, int posicion, int valor);
@@ -185,7 +195,7 @@ void guardarTercetos(){
 			fprintf(arch, "mostrame");
 			break;
 		case RESTO:
-			fprintf(arch, "%");
+			fprintf(arch, "%%");
 			break;
 		case CMP:
 			fprintf(arch, "CMP");
@@ -208,11 +218,8 @@ void guardarTercetos(){
 		case BLT:
 			fprintf(arch, "BLT");
 			break;
-		case JMP:
-			fprintf(arch, "JMP");
-			break;
-		case INL:
-			fprintf(arch, "INL");
+		case BI:
+			fprintf(arch, "BI");
 			break;
 		default:
 			fprintf(arch, "operador no encontrado");
@@ -267,27 +274,108 @@ int saltarFalse(int comp){
 	return NOOP;
 }
 
-// Función para inicializar una pila
-void inicializarPila(Pila *pila) {
-    pila->cima = -1; // Inicializa la cima de la pila
+void crear_pila(t_pila* p)
+{
+    *p=NULL;
 }
 
-// Función para apilar un elemento en la pila
-void apilar(Pila *pila, int valor) {
-    if (pila->cima < MAX_TAMANO_PILA - 1) {
-        pila->datos[++pila->cima] = valor;
-    } else {
-        printf("La pila está llena. No se pueden apilar más elementos.\n");
-		return;
+int apilar(t_pila* p,char* d)
+{
+
+    r_nodo* nuevo=(r_nodo*)malloc(sizeof(r_nodo));
+
+    if(!nuevo){
+    	printf("No se pudo reservar memoria\n");
+        return 0;
     }
+
+    strcpy(nuevo->dato,d);
+
+    nuevo->ant=*p;
+    *p=nuevo;
+
+    return 1;
 }
 
-// Función para desapilar un elemento de la pila
-int desapilar(Pila *pila) {
-    if (pila->cima >= 0) {
-        return pila->datos[pila->cima--];
-    } else {
-        printf("La pila está vacía. No se pueden desapilar más elementos.\n");
-        return -1; // Valor para indicar un error o pila vacía
+
+int apilarTODO(t_pila* p, char* d, int nro){
+
+ r_nodo* nuevo=(r_nodo*)malloc(sizeof(r_nodo));
+
+    if(!nuevo){
+        printf("No se pudo reservar memoria\n");
+        return 0;
     }
+    strcpy(nuevo->dato,d);
+    nuevo->nro = nro;
+    nuevo->ant=*p;
+    *p=nuevo;
+
+    return 1;
+
+
+}
+
+int apilarEntero(t_pila* p,int d)
+{
+
+    r_nodo* nuevo=(r_nodo*)malloc(sizeof(r_nodo));
+    if(!nuevo){
+        printf("No se pudo reservar memoria\n");
+        return 0;
+    }
+    nuevo->nro = d;
+    nuevo->ant=*p;
+    *p=nuevo;
+
+    return 1;
+}
+
+
+int verTopeEntero(t_pila* p){
+    if(!*p){
+        return -1;
+    }
+    return (*p)->nro;
+}
+
+int desapilar(t_pila* p,char* d)
+{
+    r_nodo* viejo;
+    if(!*p)
+        return 0;
+    viejo=(r_nodo*)malloc(sizeof(r_nodo));
+    viejo=*p;
+    strcpy(d,viejo->dato);
+    *p=viejo->ant;
+    free(viejo);
+    return 1;
+}
+
+int desapilarEntero(t_pila* p)
+{
+    r_nodo* viejo;
+    int retorno = 0;
+    if(!*p)
+        return 0;
+    viejo=(r_nodo*)malloc(sizeof(r_nodo));
+    viejo=*p;
+    retorno = viejo->nro;
+    *p=viejo->ant;
+    free(viejo);
+    return retorno;
+}
+
+int pila_vacia(t_pila* p)
+{
+    return !*p;
+}
+
+
+int verTope(t_pila *p, char *d){
+    if(!*p){
+        return 0;
+    }
+    strcpy(((*p)->dato), d);
+    return 1;
 }

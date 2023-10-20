@@ -26,6 +26,7 @@ typedef struct Declaracion {
 } Declaracion;
 Declaracion pilaDeclaracion[200];
 
+t_pila pilaCond;
 char idAsignar[TAM_LEXEMA];
 
 /* Cosas para comparadores booleanos */
@@ -203,7 +204,7 @@ decision:
 			;	
 
 iterador:
-			CICLO P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA					{printf("Regla 22 - CICLO\n");}
+			CICLO P_ABRE condicion P_CIERRA LL_ABRE programa {int X = desapilarEntero(&pilaCond); crear_terceto(BI,X,NOOP);} LL_CIERRA					{printf("Regla 22 - CICLO\n");}
 			|CICLO P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA			{printf("Regla 23 - CICLO NEGADO\n");}																		
 			;
 			
@@ -211,7 +212,8 @@ iterador:
 condicion:			
 			factorIzq comp_bool factorDer													{printf("Regla 24 - Comparacion menor \n");
 																							ind_condicion = crear_terceto(CMP,ind_factorIzq,ind_factorDer);
-																							crear_terceto(saltarFalse(comp_bool_actual),NOOP,NOOP);};			
+																							crear_terceto(saltarFalse(comp_bool_actual),NOOP,NOOP);
+																							apilarEntero(&pilaCond,ind_condicion);}
 
 factorIzq:
 		factor 																		{printf("Regla 25- Factor Izq \n");
@@ -356,6 +358,7 @@ int main(int argc,char *argv[])
 	 {
 		yyparse();
 	 }
+	crear_pila(&pilaCond);
 	fclose(yyin);
 	generarArchivo();
 	return 0;
