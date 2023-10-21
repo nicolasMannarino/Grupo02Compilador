@@ -81,20 +81,20 @@ int crear_terceto(int operador, int op1, int op2){
 //void modificarTerceto(int indice, int posicion, int valor);
 void modificarTerceto(int indice, int posicion, int valor){
 	if(indice > ultimo_terceto + OFFSET){
-		printf("Ups, algo fallo. Intente modificar un terceto que no existe. Mala mia.");
+		printf("Ups, algo fallo. Intente modificar un terceto que no existe.");
 		system ("Pause");
 		exit (4);
 	}
 	switch(posicion){
+	case OPERADOR:
+		lista_terceto[indice - OFFSET].operador = valor;
+		break;
 	case OP1:
 		lista_terceto[indice - OFFSET].op1 = valor;
 		break;
 	case OP2:
 		lista_terceto[indice - OFFSET].op2 = valor;
-		break;
-	case OPERADOR:
-		lista_terceto[indice - OFFSET].operador = valor;
-		break;
+		break;	
 	}
 }
 

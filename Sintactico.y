@@ -27,11 +27,15 @@ typedef struct Declaracion {
 Declaracion pilaDeclaracion[200];
 
 t_pila pilaCond;
+t_pila pilaCondDer;
 char idAsignar[TAM_LEXEMA];
 
 /* Cosas para comparadores booleanos */
 	int comp_bool_actual;
-
+int ind_saltoFalsoDer;
+int ind_condicionDer;
+int tercetoDesapilado;
+int ind_saltoFalso;
 int ind_programa;
 int ind_sentencia;
 int ind_decvar;
@@ -104,10 +108,12 @@ compOK:
 			;
 programa: 
             sentencia																{	
-																						printf("Regla 1 - Programa\n");	
+																						printf("Regla 1 - Programa\n");
+																						ind_programa = ind_sentencia;	
 																					}
             |programa sentencia														{	
 																						printf("Regla 1 - Programa\n");	
+																						ind_programa = ind_sentencia;	
 																					}
 			;			
 sentencia:			
@@ -115,21 +121,27 @@ sentencia:
 			
 			|decision 																{ 	
 																						printf("Regla 2 - Sentencia decision \n"); 
+																						ind_sentencia = ind_decision;
 																					}																		
 			|iterador																{
 																						printf("Regla 3 - Sentencia iteracion\n");
+																						ind_sentencia = ind_interador;
 																					}
 			|asignacion  															{
 																						printf("Regla 4 - Sentencia asignacion\n");
+																						ind_sentencia = ind_asignacion;
 																					}
 			|s_write	  															{
 																						printf("Regla 5 - Sentencia WRITE\n");
+																						ind_sentencia = ind_write;
 																					}
 			|s_read		  															{
 																						printf("Regla 6 - Sentencia READ\n");
+																						ind_sentencia = ind_read;
 																					}
 			|timer		  															{
 																						printf("Regla 7 - Sentencia TIMER\n");
+																						
 																					}
 			|esta_contenido		  															{
 																						printf("Regla 8 - Sentencia ESTACONTENIDO\n");
@@ -177,43 +189,41 @@ identificadores:
 			;			
 
 decision:			
-			IF P_ABRE condicion AND condicion P_CIERRA LL_ABRE programa LL_CIERRA 		{ 	
-																								printf("Regla 14 - IF con AND \n");
-																							}
-			|IF P_ABRE condicion AND condicion P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 		{ 	
-																								printf("Regla 15 - IF con AND y ELSE \n");
-																							}																				
-			|IF P_ABRE condicion OR condicion P_CIERRA LL_ABRE programa LL_CIERRA 		{ 	
-																								printf("Regla 16 - IF con OR \n");
-																							}
-			|IF P_ABRE condicion OR condicion P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 		{ 	
-																								printf("Regla 17 - IF con OR y ELSE \n");
-																							}																				
-			|IF P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA 					{ 	
-																						printf("Regla 18 - IF \n");
-																					}
-			|IF P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 	{ 
-																						printf("Regla 19 - IF con ELSE \n");
-																					}	
-			|IF P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa  LL_CIERRA		{ 	
-																						printf("Regla 20 - IF negado \n");
-																					}																			
-			|IF P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 		{ 	
-																						printf("Regla 21 - IF negado con ELSE\n");
-																					}																																	
+			IF P_ABRE condicion AND  condicionDer P_CIERRA LL_ABRE programa LL_CIERRA { printf("HOLAAAA: %d\n",ind_programa); tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1));  tercetoDesapilado = desapilarEntero(&pilaCondDer);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1));}		{ printf("Regla 14 - IF con AND \n");}
+			|IF P_ABRE condicion AND condicionDer P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 		{ 	printf("Regla 15 - IF con AND y ELSE \n");}																				
+			|IF P_ABRE condicion OR condicionDer P_CIERRA LL_ABRE programa LL_CIERRA 		{ 	printf("Regla 16 - IF con OR \n"); }
+			|IF P_ABRE condicion OR condicionDer P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 		{ 	printf("Regla 17 - IF con OR y ELSE \n");}																				
+			|IF P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA 					{ 	printf("Regla 18 - IF \n"); }
+			|IF P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 	{ printf("Regla 19 - IF con ELSE \n");}	
+			|IF P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa  LL_CIERRA		{ 	printf("Regla 20 - IF negado \n");}																			
+			|IF P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA ELSE LL_ABRE programa LL_CIERRA 		{ 	printf("Regla 21 - IF negado con ELSE\n");}																																	
 			;	
 
 iterador:
-			CICLO P_ABRE condicion P_CIERRA LL_ABRE programa {int X = desapilarEntero(&pilaCond); crear_terceto(BI,X,NOOP);} LL_CIERRA					{printf("Regla 22 - CICLO\n");}
-			|CICLO P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA			{printf("Regla 23 - CICLO NEGADO\n");}																		
+			CICLO P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA {tercetoDesapilado = desapilarEntero(&pilaCond); ind_interador = crear_terceto(BI,tercetoDesapilado,NOOP);tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado,  OP1,  (ind_interador+1));}					{printf("Regla 22 - CICLO\n");}
+			|CICLO P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA {tercetoDesapilado = desapilarEntero(&pilaCond); ind_interador = crear_terceto(BI,tercetoDesapilado,NOOP); tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado,  OP1,  (ind_interador+1));}			{printf("Regla 23 - CICLO NEGADO\n");}																		
 			;
 			
 
+condicionDer:
+		factorIzq comp_bool factorDer													{printf("Regla 24 - Comparacion \n");
+																							ind_condicionDer = crear_terceto(CMP,ind_factorIzq,ind_factorDer);
+																							ind_saltoFalsoDer = crear_terceto(saltarFalse(comp_bool_actual),NOOP,NOOP);
+																							apilarEntero(&pilaCondDer,ind_saltoFalsoDer);
+																							printf("PILA TOPE: %d\n",verTopeEntero(&pilaCondDer));
+																							apilarEntero(&pilaCondDer,ind_condicionDer);
+																							printf("PILA TOPE: %d\n",verTopeEntero(&pilaCondDer));
+																							}
+
 condicion:			
-			factorIzq comp_bool factorDer													{printf("Regla 24 - Comparacion menor \n");
+			factorIzq comp_bool factorDer													{printf("Regla 24 - Comparacion \n");
 																							ind_condicion = crear_terceto(CMP,ind_factorIzq,ind_factorDer);
-																							crear_terceto(saltarFalse(comp_bool_actual),NOOP,NOOP);
-																							apilarEntero(&pilaCond,ind_condicion);}
+																							ind_saltoFalso = crear_terceto(saltarFalse(comp_bool_actual),NOOP,NOOP);
+																							apilarEntero(&pilaCond,ind_saltoFalso);
+																							printf("PILA TOPE: %d\n",verTopeEntero(&pilaCond));
+																							apilarEntero(&pilaCond,ind_condicion);
+																							printf("PILA TOPE: %d\n",verTopeEntero(&pilaCond));
+																							}
 
 factorIzq:
 		factor 																		{printf("Regla 25- Factor Izq \n");
@@ -286,7 +296,6 @@ termino:
 
 factor: 
       ID 									{printf("\nRegla 45 - Factor ID \n");
-	  										printf("\nnombre ID %s\n", $1);
 	  										int pos = buscarEnTabla($1);
 	  										ind_factor = crear_terceto(NOOP,pos,NOOP);}
       | CTE_INT 							{printf("\nRegla 46 - Factor CTE_INT \n");
@@ -358,6 +367,8 @@ int main(int argc,char *argv[])
 	 {
 		yyparse();
 	 }
+
+	crear_pila(&pilaCondDer);
 	crear_pila(&pilaCond);
 	fclose(yyin);
 	generarArchivo();
