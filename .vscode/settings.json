@@ -1,6 +1,7 @@
 {
-    "C_Cpp.errorSquiggles": "enabled",
+    "C_Cpp.errorSquiggles": "disabled",
     "files.associations": {
-        "tablasimbolos.h": "c"
+        "tablasimbolos.h": "c",
+        "cstring": "cpp"
     }
 }

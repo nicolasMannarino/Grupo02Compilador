@@ -1,19 +1,10 @@
 #include "TablaSimbolos.h"
 
-
 #define OFFSET TAM_TS
 #define MAX_TERCETOS 512
 #define MAX_TAMANO_PILA 100
 
 
-typedef struct f_nodo
-{
-    struct f_nodo* ant;
-    char dato[200];
-    int nro;
-}r_nodo;
-
-typedef r_nodo* t_pila;
 /* Operadores extra para usar con los tokens */
 #define NOOP -1 /* Sin operador */
 #define BLOQ 7  /* Operador que indica el orden de las sentencias */
@@ -35,20 +26,12 @@ typedef r_nodo* t_pila;
 
 /* Funciones */
 
-void crear_pila(t_pila*);
-int apilar(t_pila*,char*);
-int desapilar(t_pila*,char*);
-int pila_vacia(t_pila*);
-void vaciar_pila(t_pila*);
-int apilarTODO(t_pila*, char*, int);
-int verTope(t_pila *, char *);
-int verTopeEntero(t_pila* );
-int apilarEntero(t_pila* p,int d);
-int desapilarEntero(t_pila* p);
-
+int saltarTrue(int comp);
 int crear_terceto(int operador, int op1, int op2);
 void guardarTercetos();
 void modificarTerceto(int indice, int posicion, int valor);
+void invertirSaltoTerceto(int indice);
+/* Funciones */
 
 typedef struct{
   int operador;
@@ -60,7 +43,7 @@ terceto lista_terceto[MAX_TERCETOS];
 int ultimo_terceto; /* Apunta al ultimo terceto escrito. Incrementarlo para guardar el siguiente. */
 
 
-/* Funciones */
+
 
 //int crear_terceto(int operador, int op1, int op2);
 int crear_terceto(int operador, int op1, int op2){
@@ -95,6 +78,41 @@ void modificarTerceto(int indice, int posicion, int valor){
 	case OP2:
 		lista_terceto[indice - OFFSET].op2 = valor;
 		break;	
+	}
+}
+
+//void invertirSaltoTerceto(int indice);
+void invertirSaltoTerceto(int indice){
+	if(indice > ultimo_terceto + OFFSET){
+		printf("Ups, algo fallo. Intente modificar un terceto que no existe.");
+		system ("Pause");
+		exit (4);
+	}
+	
+	int operadorAModificar = lista_terceto[indice - OFFSET].operador;
+	printf("Indice: %d  Operador: %d\n",indice, operadorAModificar);
+	switch(operadorAModificar){
+	case BGT:
+		lista_terceto[indice - OFFSET].operador = BLE;
+		break;
+	case BGE:
+		lista_terceto[indice - OFFSET].operador = BLT;
+		break;
+	case BLT:
+		lista_terceto[indice - OFFSET].operador = BGE;
+		break;
+	case BLE:
+		lista_terceto[indice - OFFSET].operador = BGT;
+		break;
+	case BEQ:
+		lista_terceto[indice - OFFSET].operador = BNE;
+		break;
+	case BNE:
+		lista_terceto[indice - OFFSET].operador = BEQ;
+		break;
+	default:
+			printf("operador no encontrado");
+			break;
 	}
 }
 
@@ -189,10 +207,10 @@ void guardarTercetos(){
 			fprintf(arch, "\';\'");
 			break;
 		case READ:
-			fprintf(arch, "leeme");
+			fprintf(arch, "LEER");
 			break;
 		case WRITE:
-			fprintf(arch, "mostrame");
+			fprintf(arch, "ESCRIBIR");
 			break;
 		case RESTO:
 			fprintf(arch, "%%");
@@ -274,108 +292,22 @@ int saltarFalse(int comp){
 	return NOOP;
 }
 
-void crear_pila(t_pila* p)
-{
-    *p=NULL;
-}
-
-int apilar(t_pila* p,char* d)
-{
-
-    r_nodo* nuevo=(r_nodo*)malloc(sizeof(r_nodo));
-
-    if(!nuevo){
-    	printf("No se pudo reservar memoria\n");
-        return 0;
-    }
-
-    strcpy(nuevo->dato,d);
-
-    nuevo->ant=*p;
-    *p=nuevo;
-
-    return 1;
+int saltarTrue(int comp){
+	switch(comp){
+	case MAYOR:
+		return BGT;
+	case MAY_O_IG:
+		return BGE;
+	case MENOR:
+		return BLT;
+	case MEN_O_IG:
+		return BLE;
+	case IGUAL:
+		return BEQ;
+	case DISTINTO:
+		return BNE;
+	}
+	return NOOP;
 }
 
 
-int apilarTODO(t_pila* p, char* d, int nro){
-
- r_nodo* nuevo=(r_nodo*)malloc(sizeof(r_nodo));
-
-    if(!nuevo){
-        printf("No se pudo reservar memoria\n");
-        return 0;
-    }
-    strcpy(nuevo->dato,d);
-    nuevo->nro = nro;
-    nuevo->ant=*p;
-    *p=nuevo;
-
-    return 1;
-
-
-}
-
-int apilarEntero(t_pila* p,int d)
-{
-
-    r_nodo* nuevo=(r_nodo*)malloc(sizeof(r_nodo));
-    if(!nuevo){
-        printf("No se pudo reservar memoria\n");
-        return 0;
-    }
-    nuevo->nro = d;
-    nuevo->ant=*p;
-    *p=nuevo;
-
-    return 1;
-}
-
-
-int verTopeEntero(t_pila* p){
-    if(!*p){
-        return -1;
-    }
-    return (*p)->nro;
-}
-
-int desapilar(t_pila* p,char* d)
-{
-    r_nodo* viejo;
-    if(!*p)
-        return 0;
-    viejo=(r_nodo*)malloc(sizeof(r_nodo));
-    viejo=*p;
-    strcpy(d,viejo->dato);
-    *p=viejo->ant;
-    free(viejo);
-    return 1;
-}
-
-int desapilarEntero(t_pila* p)
-{
-    r_nodo* viejo;
-    int retorno = 0;
-    if(!*p)
-        return 0;
-    viejo=(r_nodo*)malloc(sizeof(r_nodo));
-    viejo=*p;
-    retorno = viejo->nro;
-    *p=viejo->ant;
-    free(viejo);
-    return retorno;
-}
-
-int pila_vacia(t_pila* p)
-{
-    return !*p;
-}
-
-
-int verTope(t_pila *p, char *d){
-    if(!*p){
-        return 0;
-    }
-    strcpy(((*p)->dato), d);
-    return 1;
-}

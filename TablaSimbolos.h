@@ -1,16 +1,22 @@
-#ifndef TablaSimbolos_h_
-#define TablaSimbolos_h_
-
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
+#include <ctype.h>
+#include <float.h>
+#include <limits.h>
+
+#ifndef TablaSimbolos_h_
+#define TablaSimbolos_h_
+
 #ifndef TAM_TS
 #define TAM_TS 1000
 #endif
 #ifndef TAM_LEXEMA
 #define TAM_LEXEMA 100
 #endif
+
+
 
 typedef struct simbolo {
 	char nombre[TAM_LEXEMA + 1];
@@ -35,7 +41,7 @@ int insertarEnTabla(char *nombre, char *tipo, char *valor, int longitud){
 	return ultimo++;
 };
 
-int buscarEnTabla(char *nombre){
+int buscarEnTabla(char* nombre){
 	int pos = 0;
 	while(pos != ultimo){
 		if(strcmp(nombre, ts[pos].nombre) == 0)

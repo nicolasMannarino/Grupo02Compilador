@@ -6,7 +6,6 @@
 #include <ctype.h>
 #include <float.h>
 #include <limits.h>
-
 #include "y.tab.h"
 
 FILE  *yyin;
