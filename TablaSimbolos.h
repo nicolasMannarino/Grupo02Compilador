@@ -41,8 +41,15 @@ int insertarEnTabla(char *nombre, char *tipo, char *valor, int longitud){
 	return ultimo++;
 };
 
+void eliminarGuionBajo(char *palabra) {
+    if (palabra != NULL && palabra[0] == '_') {
+        memmove(palabra, palabra + 1, strlen(palabra));
+    }
+}
+
 int buscarEnTabla(char* nombre){
 	int pos = 0;
+  eliminarGuionBajo(nombre);
 	while(pos != ultimo){
 		if(strcmp(nombre, ts[pos].nombre) == 0)
 			return pos;

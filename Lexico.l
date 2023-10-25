@@ -73,6 +73,17 @@ NUMERAL         "#"
 "AND"|"and"		{return AND;}
 "!"				{return NEGADO;}
 
+{ID}			{
+					char nombre[31];
+					char valor[30];
+					sprintf(nombre, "_%d", atoi(yytext));
+					sprintf(valor, "%d", atoi(yytext));
+					
+					
+					if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, "", valor, "");
+					yylval = (int)yytext;
+					return ID;
+                }
 
 {CTE_STRING}	{
 					char nombre[41];
@@ -120,18 +131,6 @@ NUMERAL         "#"
 					}
 					yylval = (int)yytext;
 					return CTE_FLOAT;
-                }
-
-{ID}			{
-
-					char nombre[31];
-					char valor[30];
-					sprintf(nombre, "_%d", atoi(yytext));
-					sprintf(valor, "%d", atoi(yytext));
-					
-					if(buscarEnTabla(nombre) == -1) insertarEnTabla(nombre, "", valor, "");
-					yylval = (int)yytext;
-					return ID;
                 }
 
 {OP_SUM}		{return OP_SUM;}

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 #include "y.tab.h"
 #include "TablaSimbolos.h"
 #include "tercetos.h"
@@ -17,6 +18,7 @@ int yylex();
 char tipoDato[31];
 int ult;
 
+int EstaContenidoFuncion(const char*,const char*);
 typedef struct Declaracion {
 	char nombreDato[31];
 } Declaracion;
@@ -27,6 +29,8 @@ t_pila pilaCondDer;
 char idAsignar[TAM_LEXEMA];
 
 /* Cosas para comparadores booleanos */
+int posCadena2;
+int posCadena1;
 int ind_lectura;
 int ind_escritura;
 int comp_bool_actual;
@@ -98,6 +102,7 @@ int ind_factorIzq;
 %token READ
 %token TIMER
 %token ESTACONTENIDO
+%token RESULTADO
 
 %%
 compOK:	
@@ -248,30 +253,28 @@ comp_bool:
 														comp_bool_actual = DISTINTO;};
 
 asignacion:
-            ID {strcpy(idAsignar, (char *)$1);} OP_ASIG expresion				{printf("\nRegla 33 - Asignacion\n");	
-																		int pos = buscarEnTabla(idAsignar);
-																		ind_asignacion = crear_terceto(OP_ASIG,pos,ind_expresion);
-																		}	
-			;
+            ID {strcpy(idAsignar, (char *)$1);} OP_ASIG expresion				{
+																				printf("\nRegla 33 - Asignacion\n");	
+																				int pos = buscarEnTabla(idAsignar);
+																				ind_asignacion = crear_terceto(OP_ASIG,pos,ind_expresion);
+																				};
 
 s_read:
-		READ P_ABRE ID	P_CIERRA					{printf("\nRegla 34 - lectura es READ ID(%s)\n", $2);
-													int pos = buscarEnTabla((char *)$2);
-													ind_lectura = crear_terceto(READ, pos, NOOP);};
+		READ P_ABRE ID	{printf("\nRegla 34 - lectura es READ ID %s\n", (char*) $3);int pos = buscarEnTabla((char*) $3);ind_lectura = crear_terceto(READ, pos, NOOP);} P_CIERRA
 			
 s_write:
-		WRITE P_ABRE ID	P_CIERRA					        {printf("\nRegla 35 - WRITE\n");
-															int pos = buscarEnTabla((char *)$2);
-															ind_escritura = crear_terceto(WRITE, pos, NOOP);}	
-		|WRITE P_ABRE CTE_STRING P_CIERRA					{printf("\nRegla 35 - WRITE\n");
-															int pos = buscarEnTabla((char *)$2);
-															ind_escritura = crear_terceto(WRITE,  pos, NOOP);};
+		WRITE P_ABRE ID {printf("\nRegla 35 - WRITE %s\n", $3); int pos = buscarEnTabla((char *)$3); ind_escritura = crear_terceto(WRITE, pos, NOOP); }		P_CIERRA					        
+		|WRITE P_ABRE CTE_STRING {printf("\nRegla 35 - WRITE %s\n",$3);int pos = buscarEnTabla((char *)$3);ind_escritura = crear_terceto(WRITE,  pos, NOOP);} P_CIERRA
 
 timer:
-    TIMER P_ABRE CTE_INT COMA sentencia P_CIERRA {printf("\nRegla 36 - Funcion Timer\n");}
+    TIMER P_ABRE CTE_INT COMA sentencia P_CIERRA {printf("\nRegla 36 - Funcion Timer\n");crear_terceto(TIMER,$3,ind_sentencia);}
 
 esta_contenido:
-    ESTACONTENIDO P_ABRE CTE_STRING COMA CTE_STRING P_CIERRA {printf("\nRegla 37 - Funcion ESTACONTENIDO\n");}
+    ESTACONTENIDO P_ABRE CTE_STRING{posCadena1 = buscarEnTabla((char *)$3);} COMA CTE_STRING 
+	{printf("\nRegla 37 - Funcion ESTACONTENIDO\n"); 
+	posCadena2 = buscarEnTabla((char*)$5);
+	crear_terceto(ESTACONTENIDO,posCadena1,posCadena2);	 	 
+	crear_terceto(RESULTADO,false,NOOP);} P_CIERRA  
 
 
 expresion:
@@ -323,7 +326,29 @@ factor:
       ;
 
 %%
+int EstaContenidoFuncion(const char *cadena1,const char *cadena2) {
+    if (cadena1 == NULL || cadena2 == NULL) {
+        return 0; // Si alguna de las cadenas es nula, no están contenidas.
+    }
 
+    // Usamos la función strstr para buscar cadena1 en cadena2.
+    // Si la función encuentra cadena1 en cadena2, devuelve un puntero a la primera ocurrencia,
+    // lo que significa que está contenida. Si no se encuentra, devuelve NULL.
+ 	if(strstr(cadena2, cadena1) != NULL)
+		return 1;
+		
+	printf("LLEGUE ACAAAAAAA33332");
+	return false;
+}
+
+
+void Timer(int condicion, void (*operacion)()) {
+    int contador = 0;
+    while (contador < condicion) {
+        operacion();
+        contador++;
+    }
+}
 
 int insertarVariables(Declaracion *pilaDeclaracion, char *tipoD, int cantidad) {
 	int i = 0;

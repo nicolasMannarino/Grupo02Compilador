@@ -141,7 +141,7 @@ a2:=-32767
 
 
 #/Probando cota de String\#
-#/str1:="Cadena que contiene mas caracteres de los permitidosaaaaaaaaaaaaaaaaaaaaaaaaaaa"\#
+#/str1:="Cadena que contiene mas caracteres de los permitidos"\#
 str2:="Cadena correcta"
 
 #/Probando RESTO\#
@@ -155,3 +155,6 @@ Timer(5, WRITE ("Hello World"))
 
 #/Probando ESTACONTENIDO\#
 EstaContenido("Homoplato", "plato")
+
+READ (a1)
+WRITE ("hola")

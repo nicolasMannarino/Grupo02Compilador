@@ -200,6 +200,9 @@ void guardarTercetos(){
 		case ESTACONTENIDO:
 			fprintf(arch, "estacontenido");
 			break;
+		case RESULTADO:
+			fprintf(arch, "resultado");
+			break;
 		case COMA:
 			fprintf(arch, "\',\'");
 			break;
