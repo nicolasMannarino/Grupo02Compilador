@@ -24,8 +24,6 @@ char errorMsg[100];
 DIGITO			[0-9]
 LETRA			[a-zA-Z]
 COMENTARIO		^#\/.+#$
-
-
 CTE_STRING		\"([^\"\\\\]|\\\\.)*\"
 CTE_FLOAT		({DIGITO}+"."{DIGITO}+)|("."{DIGITO}+)|({DIGITO}+".")
 CTE_INT			({DIGITO}+)|("-".{DIGITO}+)

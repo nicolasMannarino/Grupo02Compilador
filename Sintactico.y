@@ -26,11 +26,15 @@ Declaracion pilaDeclaracion[200];
 
 t_pila pilaCond;
 t_pila pilaCondDer;
+t_pila pilaTimer;
 char idAsignar[TAM_LEXEMA];
 
 /* Cosas para comparadores booleanos */
+
 int posCadena2;
 int posCadena1;
+int ind_condicionTimer;
+int ind_timer;
 int ind_lectura;
 int ind_escritura;
 int comp_bool_actual;
@@ -267,41 +271,31 @@ s_write:
 		|WRITE P_ABRE CTE_STRING {printf("\nRegla 35 - WRITE %s\n",$3);int pos = buscarEnTabla((char *)$3);ind_escritura = crear_terceto(WRITE,  pos, NOOP);} P_CIERRA
 
 timer:
-    TIMER P_ABRE CTE_INT COMA sentencia P_CIERRA {printf("\nRegla 36 - Funcion Timer\n");crear_terceto(TIMER,$3,ind_sentencia);}
+	TIMER P_ABRE CTE_INT {int i;int pos = buscarEnTabla((char *)$3); crear_terceto(TIMER,NOOP,NOOP);
+	
+	ind_timer=crear_terceto(CMP,i,pos);
+	apilarEntero(&pilaTimer,ind_timer);}
+	COMA sentencia P_CIERRA {crear_terceto(BI,desapilarEntero(&pilaTimer),NOOP);printf("\nRegla 36 - Funcion Timer\n");}
 
 esta_contenido:
     ESTACONTENIDO P_ABRE CTE_STRING{posCadena1 = buscarEnTabla((char *)$3);} COMA CTE_STRING 
-	{printf("\nRegla 37 - Funcion ESTACONTENIDO\n"); 
-	posCadena2 = buscarEnTabla((char*)$5);
+	{
+	posCadena2 = buscarEnTabla((char *)$5);
 	crear_terceto(ESTACONTENIDO,posCadena1,posCadena2);	 	 
-	crear_terceto(RESULTADO,false,NOOP);} P_CIERRA  
+	crear_terceto(RESULTADO,false,NOOP);
+	printf("\nRegla 37 - Funcion ESTACONTENIDO\n"); } P_CIERRA  
 
 
 expresion:
-         termino							{printf("\nRegla 38 - Expresion\n");
-		 									 ind_expresion = ind_termino;}
-	     |expresion OP_SUM termino			{printf("\nRegla 39 - Expresion suma\n");
-		 									 ind_expresion = crear_terceto(OP_SUM,ind_expresion,ind_termino);
-											 }
-         |expresion OP_RES termino			{printf("\nRegla 40 - Expresion resta\n");
-		 									ind_expresion = crear_terceto(OP_RES,ind_expresion,ind_termino);
-											 }
-		 |expresion RESTO termino			{printf("\nRegla 41 - Expresion resto\n");
-		 									ind_expresion = crear_terceto(RESTO,ind_expresion,ind_termino);
-											 }				
-		 ;
+         termino							{printf("\nRegla 38 - Expresion\n");ind_expresion = ind_termino;}
+	     |expresion OP_SUM termino			{printf("\nRegla 39 - Expresion suma\n");ind_expresion = crear_terceto(OP_SUM,ind_expresion,ind_termino);}
+         |expresion OP_RES termino			{printf("\nRegla 40 - Expresion resta\n");ind_expresion = crear_terceto(OP_RES,ind_expresion,ind_termino);}
+		 |expresion RESTO termino			{printf("\nRegla 41 - Expresion resto\n");ind_expresion = crear_terceto(RESTO,ind_expresion,ind_termino);};
 
 termino: 
-       factor								{printf("\nRegla 42 - Termino \n");
-	   										 ind_termino = ind_factor;
-											}
-       |termino OP_DIV factor				{printf("\nRegla 43 - Termino division\n");
-	   										 ind_termino = crear_terceto(OP_DIV,ind_termino,ind_factor);
-											   }
-       |termino OP_MUL factor				{printf("\nRegla 44 - termino multiplicacion\n");
-	   										 ind_termino = crear_terceto(OP_MUL,ind_termino,ind_factor);
-											}
-       ;	
+       factor								{printf("\nRegla 42 - Termino \n");ind_termino = ind_factor;}
+       |termino OP_DIV factor				{printf("\nRegla 43 - Termino division\n");ind_termino = crear_terceto(OP_DIV,ind_termino,ind_factor);}
+       |termino OP_MUL factor				{printf("\nRegla 44 - termino multiplicacion\n");ind_termino = crear_terceto(OP_MUL,ind_termino,ind_factor);};	
 
 factor: 
       ID 									{printf("\nRegla 45 - Factor ID \n");
@@ -399,6 +393,7 @@ int main(int argc,char *argv[])
 		yyparse();
 	 }
 
+	crear_pila(&pilaTimer);
 	crear_pila(&pilaCondDer);
 	crear_pila(&pilaCond);
 	fclose(yyin);
