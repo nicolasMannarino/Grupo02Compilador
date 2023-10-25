@@ -49,7 +49,7 @@ void eliminarGuionBajo(char *palabra) {
 
 int buscarEnTabla(char* nombre){
 	int pos = 0;
-  eliminarGuionBajo(nombre);
+  //eliminarGuionBajo(nombre);
 	while(pos != ultimo){
 		if(strcmp(nombre, ts[pos].nombre) == 0)
 			return pos;
