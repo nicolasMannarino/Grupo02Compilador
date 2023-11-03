@@ -12,6 +12,7 @@ FILE  *yyin;
 FILE *tab;
 char *yyltext;
 
+void informarError(char* mensaje);
 int yyerror(void);
 char errorMsg[100];
 
@@ -171,4 +172,11 @@ int yyerror(void)
 	printf("\nError sintactico en la linea %d\n",yylineno);
 	system ("Pause");
 	exit (1);
+}
+
+void informarError(char* mensajeError)
+{
+    printf("ERROR - %s - EN LA LINEA %d\n", mensajeError, yylineno);
+    system("Pause");
+    exit(1);
 }

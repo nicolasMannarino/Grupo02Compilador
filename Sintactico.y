@@ -28,6 +28,7 @@ t_pila pilaCond;
 t_pila pilaCondDer;
 t_pila pilaTimer;
 char idAsignar[TAM_LEXEMA];
+char id2Asignar[TAM_LEXEMA];
 
 /* Cosas para comparadores booleanos */
 
@@ -257,11 +258,26 @@ comp_bool:
 														comp_bool_actual = DISTINTO;};
 
 asignacion:
-            ID {strcpy(idAsignar, (char *)$1);} OP_ASIG expresion				{
-																				printf("\nRegla 33 - Asignacion\n");	
-																				int pos = buscarEnTabla(idAsignar);
-																				ind_asignacion = crear_terceto(OP_ASIG,pos,ind_expresion);
-																				};
+            ID {strcpy(idAsignar,(char*)$1);} OP_ASIG expresion	{	printf("\nRegla 33 - Asignacion\n");
+																		strcpy(id2Asignar, (char*)$4);
+																		if(buscarEnTabla(idAsignar) == -1)
+																			informarError("Variable no declarada");
+																		else
+																		{
+																			int pos = buscarEnTabla(idAsignar);
+																			ind_asignacion = crear_terceto(OP_ASIG,pos,ind_expresion);
+
+																			printf("tipo 1: %s\n",getTipo(idAsignar));
+																			printf("tipo 2: %s\n",getTipo(id2Asignar));
+																			if(strcmp(getTipo(idAsignar),getTipo(id2Asignar))!= 0)
+																			{
+																				
+																				informarError("Asignacion invalida");
+																			}
+																		}
+																	}
+																																		
+
 
 s_read:
 		READ P_ABRE ID	{printf("\nRegla 34 - lectura es READ ID %s\n", (char*) $3);int pos = buscarEnTabla((char*) $3);ind_lectura = crear_terceto(READ, pos, NOOP);} P_CIERRA

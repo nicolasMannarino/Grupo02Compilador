@@ -9,6 +9,7 @@
 #ifndef TablaSimbolos_h_
 #define TablaSimbolos_h_
 
+#define TAM_MATRIZ 2000
 #ifndef TAM_TS
 #define TAM_TS 1000
 #endif
@@ -16,7 +17,7 @@
 #define TAM_LEXEMA 100
 #endif
 
-
+char* getTipo(char*);
 
 typedef struct simbolo {
 	char nombre[TAM_LEXEMA + 1];
@@ -24,6 +25,7 @@ typedef struct simbolo {
  	char valor[40];
  	int longitud;
 } simbolo;
+
 
 simbolo ts[TAM_TS];
 int ultimo=0;
@@ -57,55 +59,6 @@ int buscarEnTabla(char* nombre){
 	}
 	return -1;
 };
-
-
-/*int buscarFloatEnTabla(float nombre){
-	int pos = 0;
-	while(pos != ultimo){
-    char aux[TAM_LEXEMA + 1];
-    ftoa(nombre,aux,2);
-    char nombre2[TAM_LEXEMA + 1]  = "_";
-    strcat(nombre2,aux);
-		if(strcmp(nombre2, ts[pos].nombre) == 0)
-			return pos;
-		pos++;
-	}
-	return -1;
-};*/
-
-/*int buscarIntEnTabla(int nombre){
-	int pos = 0;
-  printf("buscar int en tabla");
-  printf("%d",nombre);
-	while(pos != ultimo){
-    char aux[TAM_LEXEMA + 1];
-    itoa(nombre, aux, 10);
-    char nombre2[TAM_LEXEMA + 1]  = "_";
-    strcat(nombre2,aux);
-    printf("%s",nombre2);
-		if(strcmp(nombre2, ts[pos].nombre) == 0)
-      printf("encuentro cte int en tabla");
-			return pos;
-		pos++;
-	}
-	return -1;
-};*/
-
-/*char* getNombre(int pos){
-	return (ts[pos].nombre);
-};
-
-char* getTipo(int pos){
-	return (ts[pos].tipoDato);
-};
-
-char* getValor(int pos){
-	return (ts[pos].valor);
-};
-
-char* getLongitud(int pos){
-	return (ts[pos].longitud);
-};*/
 
 void borrarTiposDato(){
 	ultimo = ultimo - 5;
@@ -165,5 +118,16 @@ void generarArchivo()
   }
   fclose ( fp );
 }
+
+char* getTipo(char* id){
+    int aux=0;
+    while( ultimo > aux ){
+        if(strcmp(id,ts[aux].nombre) == 0){
+            return ts[aux].tipoDato;
+        }
+        aux++;
+    }
+    return "NULL";
+};
 
 #endif
