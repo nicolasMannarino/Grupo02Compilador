@@ -128,3 +128,17 @@ int verTope(t_pila *p, char *d){
     strcpy(((*p)->dato), d);
     return 1;
 }
+
+void vaciar_pila(t_pila* p)
+{
+    r_nodo* actual = *p;
+    r_nodo* siguiente;
+
+    while (actual != NULL) {
+        siguiente = actual->ant;
+        free(actual);
+        actual = siguiente;
+    }
+
+    *p = NULL;  // Establecer la pila como vacía
+}

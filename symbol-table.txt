@@ -17,3 +17,5 @@
  var3                   | INT                |                                 |           0 |
  str1                   | STRING             |                                 |           0 |
  str2                   | STRING             |                                 |           0 |
+ _"Homplato"            | CTE_STRING         |                      "Homplato" |          10 |
+ _"plato"               | CTE_STRING         |                         "plato" |           7 |
