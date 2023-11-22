@@ -7,6 +7,8 @@
 #include "TablaSimbolos.h"
 #include "tercetos.h"
 #include "Pila.h"
+#include "Assembler.h"
+#include "Cola.h"
 
 
 int yystopparser=0;
@@ -18,13 +20,13 @@ int yylex();
 char tipoDato[31];
 int ult;
 
-int EstaContenidoFuncion(const char*,const char*);
+
 typedef struct Declaracion {
 	char nombreDato[31];
 } Declaracion;
 Declaracion pilaDeclaracion[200];
 
-
+t_cola colaCond;
 t_pila pilaCondicionVerTipo;
 t_pila pilaCond;
 t_pila pilaCondDer;
@@ -37,9 +39,10 @@ char id2Asignar[TAM_LEXEMA];
 char resultadoEstaContenido[30];
 char cadena1[30];
 char cadena2[30];
+int tercetoDesencolado;
 int posCadena1;
 int posCadena2;
-ind_estaContenido;
+int ind_estaContenido;
 int ind_i_timer;
 int ind_SaltoTimer;
 int ind_condicionTimer;
@@ -122,7 +125,9 @@ int ind_factorIzq;
 compOK:	
 			programa																{	
 																						guardarTercetos();
-																						printf("Regla 0 - Compilacion OK\n");	
+																						//generarAssembler();	
+																						printf("Regla 0 - Compilacion OK\n");
+																						
 																						
 																					}
 			;
@@ -211,14 +216,18 @@ identificadores:
 decision:			
 			IF P_ABRE condicion AND  condicionDer P_CIERRA LL_ABRE programa LL_CIERRA {tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1));  tercetoDesapilado = desapilarEntero(&pilaCondDer);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1));}		{ printf("Regla 14 - IF con AND \n");}
 			|IF P_ABRE condicion AND condicionDer P_CIERRA LL_ABRE programa LL_CIERRA {tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+2));  tercetoDesapilado = desapilarEntero(&pilaCondDer);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+2));ind_condicionElse = crear_terceto(BI,NOOP,NOOP);} ELSE LL_ABRE programa LL_CIERRA {modificarTerceto(ind_condicionElse,OP1,(ind_programa+1));}		{ 	printf("Regla 15 - IF con AND y ELSE \n");}																				
+			
+			
 			|IF P_ABRE condicion OR condicionDer P_CIERRA LL_ABRE programa LL_CIERRA  {tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado+1,  OP1,  tercetoDesapilado+2); invertirSaltoTerceto(tercetoDesapilado+1);   tercetoDesapilado = desapilarEntero(&pilaCondDer);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1));}			{ 	printf("Regla 16 - IF con OR \n"); }
-			
-			
 			|IF P_ABRE condicion OR condicionDer P_CIERRA LL_ABRE programa LL_CIERRA  {tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado+1,  OP1,  tercetoDesapilado+2); invertirSaltoTerceto(tercetoDesapilado+1);   tercetoDesapilado = desapilarEntero(&pilaCondDer);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1));ind_condicionElse = crear_terceto(BI,NOOP,NOOP);}	 ELSE LL_ABRE programa LL_CIERRA  {modificarTerceto(ind_condicionElse,OP1,(ind_programa+1));}		{ 	printf("Regla 17 - IF con OR y ELSE \n");}																				
+			
+			
 			|IF P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA 	{tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1));}				{ 	printf("Regla 18 - IF \n"); }
-			|IF P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA {tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1));ind_condicionElse = crear_terceto(BI,NOOP,NOOP);}	 ELSE LL_ABRE programa LL_CIERRA {modificarTerceto(ind_condicionElse,OP1,(ind_programa+1));} 	{ printf("Regla 19 - IF con ELSE \n");}	
-			|IF P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa  LL_CIERRA {tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1)); invertirSaltoTerceto(tercetoDesapilado+1);}			{ 	printf("Regla 20 - IF negado \n");}																			
-			|IF P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA {tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1)); invertirSaltoTerceto(tercetoDesapilado+1); ind_condicionElse = crear_terceto(BI,NOOP,NOOP);} ELSE LL_ABRE programa LL_CIERRA {modificarTerceto(ind_condicionElse,OP1,(ind_programa+1));}		{ 	printf("Regla 21 - IF negado con ELSE\n");}																																	
+			|IF P_ABRE condicion P_CIERRA LL_ABRE programa LL_CIERRA {tercetoDesapilado = desapilarEntero(&pilaCond);modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+2));ind_condicionElse = crear_terceto(BI,NOOP,NOOP);}	 ELSE LL_ABRE programa LL_CIERRA {modificarTerceto(ind_condicionElse,OP1,(ind_programa+1));} 	{ printf("Regla 19 - IF con ELSE \n");}	
+			
+			
+			|IF P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa  LL_CIERRA {tercetoDesapilado = desapilarEntero(&pilaCond);  modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1)); invertirSaltoTerceto(tercetoDesapilado+1);}			{ 	printf("Regla 20 - IF negado \n");}																			
+			|IF P_ABRE NEGADO condicion P_CIERRA LL_ABRE programa LL_CIERRA {tercetoDesapilado = desapilarEntero(&pilaCond); modificarTerceto( tercetoDesapilado+1,  OP1,  (ind_programa+1)); invertirSaltoTerceto(tercetoDesapilado+1); ind_condicionElse = crear_terceto(BI,NOOP,NOOP);} ELSE LL_ABRE programa LL_CIERRA {modificarTerceto(ind_condicionElse,OP1,(ind_programa+1));}		{ 	printf("Regla 21 - IF negado con ELSE\n");}																																	
 			;	
 
 iterador:
@@ -242,6 +251,8 @@ condicionDer:
 																								ind_saltoFalsoDer = crear_terceto(saltarFalse(comp_bool_actual),NOOP,NOOP);
 																								apilarEntero(&pilaCondDer,ind_saltoFalsoDer);
 																								apilarEntero(&pilaCondDer,ind_condicionDer);
+																								encolar(&colaCond, ind_saltoFalsoDer);
+																								encolar(&colaCond, ind_condicionDer);
 																							}
 																							
 																							}
@@ -251,6 +262,8 @@ condicionDer:
 																								else
 																									ind_condicionDer=crear_terceto(CMP,FALSO,VERDADERO);
 																								ind_saltoFalsoDer=crear_terceto(BNE,NOOP,NOOP);
+																								encolar(&colaCond, ind_saltoFalsoDer);
+																								encolar(&colaCond, ind_condicionDer);
 																								apilarEntero(&pilaCondDer,ind_saltoFalsoDer);
 																								apilarEntero(&pilaCondDer,ind_condicionDer);
 																							}																					
@@ -271,6 +284,8 @@ condicion:
 																								ind_saltoFalso = crear_terceto(saltarFalse(comp_bool_actual),NOOP,NOOP);
 																								apilarEntero(&pilaCond,ind_saltoFalso);
 																								apilarEntero(&pilaCond,ind_condicion);
+																								encolar(&colaCond, ind_saltoFalso);
+																								encolar(&colaCond, ind_condicion);
 																							}																						
 																							
 																							}
@@ -282,6 +297,8 @@ condicion:
 																								ind_saltoFalso=crear_terceto(BNE,NOOP,NOOP);
 																								apilarEntero(&pilaCond,ind_saltoFalso);
 																								apilarEntero(&pilaCond,ind_condicion);
+																								encolar(&colaCond, ind_saltoFalso);
+																								encolar(&colaCond, ind_condicion);
 																							}																					
 
 factorIzq:
@@ -327,11 +344,16 @@ asignacion:
 
 
 s_read:
-		READ P_ABRE ID	{printf("\nRegla 34 - lectura es READ ID %s\n", (char*) $3);int pos = buscarEnTabla((char*) $3);ind_lectura = crear_terceto(READ, pos, NOOP);} P_CIERRA
+		READ P_ABRE ID	{printf("\nRegla 34 - lectura es READ ID %s\n", (char*) $3);int pos = buscarEnTabla((char*) $3); ind_lectura = crear_terceto(READ, pos, NOOP);} P_CIERRA
 			
 s_write:
-		WRITE P_ABRE ID {printf("\nRegla 35 - WRITE %s\n", $3); int pos = buscarEnTabla((char *)$3); ind_escritura = crear_terceto(WRITE, pos, NOOP); }		P_CIERRA					        
-		|WRITE P_ABRE CTE_STRING {printf("\nRegla 35 - WRITE %s\n",$3);int pos = buscarEnTabla((char *)$3);ind_escritura = crear_terceto(WRITE,  pos, NOOP);} P_CIERRA
+		WRITE P_ABRE ID {printf("\nRegla 35 - WRITE %s\n", $3);
+		int pos = buscarEnTabla($3);
+		ind_escritura = crear_terceto(WRITE, pos, NOOP); }		P_CIERRA					        
+		|WRITE P_ABRE CTE_STRING {printf("\nRegla 35 - WRITE %s\n",$3);
+		 char resultado[10];sprintf(resultado, "%c%s", '_', $3); 
+		 int pos = buscarEnTabla(resultado);
+		 ind_escritura = crear_terceto(WRITE,  pos, NOOP);} P_CIERRA
 
 timer:
 	TIMER P_ABRE CTE_INT {insertarEnTabla("@i", "INT", "0", 0);
@@ -399,7 +421,7 @@ termino:
 
 factor: 
       ID  									{
-											apilar(&pilaCondicionVerTipo,getTipo((int)$1));
+											apilar(&pilaCondicionVerTipo,(char*)(getTipo((int)$1)));
 											strcpy(idAsignar,(char*)$1);
 											printf("\nRegla 45 - Factor ID \n");
 	  										int pos = buscarEnTabla((char *)$1);
@@ -499,7 +521,7 @@ void limpiarCadenas(char *cadena) {
     }
 }
 
-int EstaContenidoFuncion(const char *cadena1,const char *cadena2) {
+int EstaContenidoFuncion(char *cadena1,char *cadena2) {
 	limpiarCadenas(cadena1);
 	limpiarCadenas(cadena2);
     if (cadena1 == NULL || cadena2 == NULL) {
@@ -577,6 +599,8 @@ int main(int argc,char *argv[])
 	crear_pila(&pilaCondDer);
 	crear_pila(&pilaCond);
 	crear_pila(&pilaAsign);
+
+	crear_cola(&colaCond);
 	fclose(yyin);
 	generarArchivo();
 	return 0;

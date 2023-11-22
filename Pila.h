@@ -9,6 +9,8 @@ typedef struct f_nodo
 
 typedef r_nodo* t_pila;
 
+
+
 /* Funciones */
 
 void crear_pila(t_pila*);

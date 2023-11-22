@@ -7,8 +7,8 @@
 
 /* Operadores extra para usar con los tokens */
 #define NOOP -1 /* Sin operador */
-#define VERDADERO 1
-#define FALSO 3
+#define VERDADERO 2222
+#define FALSO 1111
 #define BLOQ 7  /* Operador que indica el orden de las sentencias */
 #define CMP 21  /* Comparador de assembler */
 #define BNE 2   /* = */
