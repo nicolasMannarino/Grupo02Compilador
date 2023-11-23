@@ -18,6 +18,7 @@ var3:=5
 
 #/Prueba READ y WRITE\#
 READ (a1)
+READ (a2)
 WRITE ("hola")
 
 #/Prueba condiciones\#
@@ -74,7 +75,7 @@ ELSE
 }
 
 
-IF(!a1>a2)
+IF(a1>a2)
 {
     a1:=4
 }

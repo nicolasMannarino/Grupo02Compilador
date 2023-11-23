@@ -1,7 +1,7 @@
 #include "TablaSimbolos.h"
 
 #define OFFSET TAM_TS
-#define MAX_TERCETOS 512
+#define MAX_TERCETOS 200
 #define MAX_TAMANO_PILA 100
 
 
@@ -146,7 +146,7 @@ void guardarTercetos(){
 			fprintf(arch, "declaracion");
 			break;
 		case IF:
-			fprintf(arch, "if");
+			fprintf(arch, "IF");
 			break;
 		case ELSE:
 			fprintf(arch, "cuerpoElse");
@@ -205,6 +205,12 @@ void guardarTercetos(){
 		case RESULTADO:
 			fprintf(arch, "resultado");
 			break;
+		case END_IF:
+			fprintf(arch, "END_IF");
+			break;
+		case END_WHILE:
+			fprintf(arch, "END_WHILE");
+			break;	
 		case COMA:
 			fprintf(arch, "\',\'");
 			break;
