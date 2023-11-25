@@ -11,6 +11,7 @@ void escribirInicioCodigo(FILE* arch);
 void escribirFinal(FILE *arch);
 void generarTabla(FILE* arch);
 
+void finIfOWhile(FILE* arch, char* etiqueta);
 void escribirEtiqueta(FILE* arch, char* etiqueta, int n);
 void escribirSalto(FILE* arch, char* salto, int tercetoDestino);
 void asignacion(FILE* arch, int terceto);
@@ -41,13 +42,13 @@ void generarAssembler(){
   generarTabla(arch);
   escribirInicioCodigo(arch);
   int i;
-    printf("Contenido de lista_terceto:\n");
+    /*printf("Contenido de lista_terceto:\n");
     for (i = 0; i < 175; i++) {
         printf("Elemento %d:\n", i + 1);
         printf("  Operador: %d\n", lista_terceto[i].operador);
         printf("  Op1: %d\n", lista_terceto[i].op1);
         printf("  Op2: %d\n", lista_terceto[i].op2);
-    }
+    }*/
 
   for( i=0; i <= ultimo_terceto; i++){
 	//printf("%d\n",lista_terceto[i].operador);
@@ -83,16 +84,16 @@ void generarAssembler(){
         finIfOWhile(arch, "END_IF");
         break;
       case ELSE:
-        escribirEtiqueta(arch, "else", i);
+        finIfOWhile(arch, "ELSE");
         break;
       case CICLO:
-        escribirEtiqueta(arch, "while", i);
+        escribirEtiqueta(arch, "CICLO", i);
         break;
       case ESTACONTENIDO:
-		escribirEtiqueta(arch, "estaContenido", i);
+		escribirEtiqueta(arch, "ESTACONTENIDO", i);
 		break;
 	  case TIMER:
-		escribirEtiqueta(arch, "timer", i);
+		escribirEtiqueta(arch, "TIMER", i);
 		break;
       case OP_SUM:
 		suma(arch,i);
@@ -213,6 +214,11 @@ void finIfOWhile(FILE* arch, char* ind){
 			fprintf(arch, "END_IF\n");
 			fprintf(arch, saltoAssembler);
 	}
+		if (strcmp(ind, "ELSE") == 0) {
+			desapilar(&pilaSalto,saltoAssembler);
+			fprintf(arch, "ELSE\n");
+			fprintf(arch, saltoAssembler);
+	}
 }
 
 
@@ -240,16 +246,12 @@ void resta(FILE* arch, int ind){
 		int aux;
 		if((aux = lista_terceto[ind].op1) < OFFSET){ //Es decir si está en la tabla
 			if (strcmp(ts[aux].tipoDato, "INT") == 0) {
-				// FILD n; Donde n es el número integer en memoria
-				fprintf(arch, "FILD %s\n", ts[aux].nombre);
+				fprintf(arch, "FLD %s\n", ts[aux].nombre);
 			} else if (strcmp(ts[aux].tipoDato, "FLOAT") == 0) {
-				// FLD n; Donde n es el número float en memoria
 				fprintf(arch, "FLD %s\n", ts[aux].nombre);
 			} else if (strcmp(ts[aux].tipoDato, "CTE_INT") == 0) {
-				// FILD n; Donde n es el número integer en tabla
-				fprintf(arch, "FILD %s\n", ts[aux].nombre);
+				fprintf(arch, "FLD %s\n", ts[aux].nombre);
 			} else if (strcmp(ts[aux].tipoDato, "CTE_FLOAT") == 0) {
-				// FLD n; Donde n es el número float en tabla
 				fprintf(arch, "FLD %s\n", ts[aux].nombre);
 			}
 
@@ -280,32 +282,24 @@ void levantarEnPila(FILE* arch, const int ind){
 	/* Si el elemento no está en pila lo levanta */
 	if(elemIzq < OFFSET){
 			if (strcmp(ts[elemIzq].tipoDato, "INT") == 0) {
-			// FILD n; Donde n es el número integer en memoria
-			fprintf(arch, "FILD %s\n", ts[elemIzq].nombre);
+			fprintf(arch, "FLD %s\n", ts[elemIzq].nombre);
 		} else if (strcmp(ts[elemIzq].tipoDato, "FLOAT") == 0) {
-			// FLD n; Donde n es el número float en memoria
 			fprintf(arch, "FLD %s\n", ts[elemIzq].nombre);
 		} else if (strcmp(ts[elemIzq].tipoDato, "CTE_INT") == 0) {
-			// FILD n; Donde n es el número integer en tabla
-			fprintf(arch, "FILD %s\n", ts[elemIzq].nombre);
+			fprintf(arch, "FLD %s\n", ts[elemIzq].nombre);
 		} else if (strcmp(ts[elemIzq].tipoDato, "CTE_FLOAT") == 0) {
-			// FLD n; Donde n es el número float en tabla
 			fprintf(arch, "FLD %s\n", ts[elemIzq].nombre);
 		}
 		izqLevantado=1;
 	}
 	if(elemDer < OFFSET){
 		if (strcmp(ts[elemDer].tipoDato, "INT") == 0) {
-			// FILD n; Donde n es el número integer en memoria
-			fprintf(arch, "FILD %s\n", ts[elemDer].nombre);
+			fprintf(arch, "FLD %s\n", ts[elemDer].nombre);
 		} else if (strcmp(ts[elemDer].tipoDato, "FLOAT") == 0) {
-			// FLD n; Donde n es el número float en memoria
 			fprintf(arch, "FLD %s\n", ts[elemDer].nombre);
 		} else if (strcmp(ts[elemDer].tipoDato, "CTE_INT") == 0) {
-			// FILD n; Donde n es el número integer en tabla
-			fprintf(arch, "FILD %s\n", ts[elemDer].nombre);
+			fprintf(arch, "FLD %s\n", ts[elemDer].nombre);
 		} else if (strcmp(ts[elemDer].tipoDato, "CTE_FLOAT") == 0) {
-			// FLD n; Donde n es el número float en tabla
 			fprintf(arch, "FLD %s\n", ts[elemDer].nombre);
 		}
 
@@ -319,13 +313,13 @@ void levantarEnPila(FILE* arch, const int ind){
 void write(FILE* arch, int terceto){
 	int ind = lista_terceto[terceto].op1; //Indice de entrada a tabla de simbolos del mensaje a mostrar
 		if (strcmp(ts[ind].tipoDato, "INT") == 0) {
-			fprintf(arch, "DisplayInteger %s\n", ts[ind].nombre);
+			fprintf(arch, "displayInteger %s", ts[ind].nombre);
 		} else if (strcmp(ts[ind].tipoDato, "FLOAT") == 0) {
-			fprintf(arch, "DisplayFloat %s,2\n", ts[ind].nombre);
+			fprintf(arch, "displayFloat %s,2\n", ts[ind].nombre);
 		} else if (strcmp(ts[ind].tipoDato, "STRING") == 0) {
-			fprintf(arch, "MOV EBX, %s\ndisplayString [EBX]\n", ts[ind].nombre);
+			fprintf(arch, "displayString %s", ts[ind].nombre);
 		} else if (strcmp(ts[ind].tipoDato, "CTE_STRING") == 0) {
-			fprintf(arch, "displayString %s\n", ts[ind].nombre);
+			fprintf(arch, "displayString %s", ts[ind].nombre);
 		}
 
 	fprintf(arch, "\n");
@@ -334,11 +328,11 @@ void write(FILE* arch, int terceto){
 void read(FILE* arch, int terceto){
 	int ind = lista_terceto[terceto].op1;
 	if (strcmp(ts[ind].tipoDato, "INT") == 0) {
-		fprintf(arch, "getInteger %s\n", ts[ind].nombre);
+		fprintf(arch, "getInteger %s", ts[ind].nombre);
 	} else if (strcmp(ts[ind].tipoDato, "FLOAT") == 0) {
-		fprintf(arch, "getFloat %s\n", ts[ind].nombre);
+		fprintf(arch, "getFloat %s", ts[ind].nombre);
 	} else if (strcmp(ts[ind].tipoDato, "STRING") == 0) {
-		fprintf(arch, "getString %s\n", ts[ind].nombre);
+		fprintf(arch, "getString %s", ts[ind].nombre);
 	}
 	fprintf(arch, "\n");
 }

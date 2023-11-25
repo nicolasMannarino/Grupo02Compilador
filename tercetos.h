@@ -149,10 +149,10 @@ void guardarTercetos(){
 			fprintf(arch, "IF");
 			break;
 		case ELSE:
-			fprintf(arch, "cuerpoElse");
+			fprintf(arch, "ELSE");
 			break;
 		case CICLO:
-			fprintf(arch, "while");
+			fprintf(arch, "CICLO");
 			break;
 		case OP_ASIG:
 			fprintf(arch, ":=");
@@ -200,10 +200,10 @@ void guardarTercetos(){
 			fprintf(arch, "timer");
 			break;
 		case ESTACONTENIDO:
-			fprintf(arch, "estacontenido");
+			fprintf(arch, "ESTACONTENIDO");
 			break;
 		case RESULTADO:
-			fprintf(arch, "resultado");
+			fprintf(arch, "RESULTADO");
 			break;
 		case END_IF:
 			fprintf(arch, "END_IF");
