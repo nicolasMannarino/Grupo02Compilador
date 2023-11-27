@@ -2,9 +2,9 @@ PATH=C:\TASM;
 
 tasm numbers.asm
 tasm Final.asm
-tlink ejemplo.obj numbers.obj
-ejemplo.exe
-del ejemplo.obj 
+tlink Final.obj numbers.obj
+Final.exe
+del Final.obj 
 del numbers.obj 
-del ejemplo.exe
-del ejemplo.map
+del Final.exe
+del Final.map
