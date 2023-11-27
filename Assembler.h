@@ -2,7 +2,7 @@
 #include <stdlib.h>
 
 
-t_pila pilaSalto;
+int vectorSaltos[MAX_TERCETOS];
 char saltoActual[80];
 int nroSalto = 0;
 void generarAssembler();
@@ -11,7 +11,7 @@ void escribirInicioCodigo(FILE* arch);
 void escribirFinal(FILE *arch);
 void generarTabla(FILE* arch);
 
-void finIfOWhile(FILE* arch, char* etiqueta);
+void finIfOWhile(FILE* arch, char* etiqueta, int i);
 void escribirEtiqueta(FILE* arch, char* etiqueta, int n);
 void escribirSalto(FILE* arch, char* salto, int tercetoDestino);
 void asignacion(FILE* arch, int terceto);
@@ -24,35 +24,79 @@ void levantarEnPila(FILE* arch, const int ind);
 void write(FILE* arch, int ind);
 void read(FILE* arch, int ind);
 
+typedef struct{
+  int indice;
+  int operador;
+  int op1;
+  int op2;
+} tercetoConIndice;
+
 //Variables externas
 extern simbolo ts[TAM_TS];
 extern int ultimo;
 extern terceto lista_terceto[MAX_TERCETOS];
 extern int ultimo_terceto;
 
+tercetoConIndice lista_terceto_con_indice[MAX_TERCETOS];
+
+int encontrarValor(int vector[], int valor) {
+	int i;
+    for ( i = 0; i < MAX_TERCETOS; i++) {
+        if (vector[i] == valor) {
+            return 1; // Devuelve 1 si se encuentra
+        }
+    }
+    return -1; // Devuelve -1 si el valor no se encuentra en el vector
+}
+
+
+int encontrarYEscribirEnPosicionLibre(int vector[], int tamano, int valor) {
+    int primeraPosicionLibre = -1;
+	int i;
+    for (i = 0; i < tamano; i++) {
+        if (vector[i] == 0) {
+            primeraPosicionLibre = i;
+            break;
+        }
+    }
+
+    if (primeraPosicionLibre != -1) {
+        vector[primeraPosicionLibre] = valor;
+        return primeraPosicionLibre;
+    } else {
+        return -1;
+    }
+}
+
 void generarAssembler(){
-  crear_pila(&pilaSalto);
   FILE* arch = fopen("Final.asm", "w");
   if(!arch){
 		printf("No pude crear el archivo final.txt\n");
 		return;
 	}
+  int i;
+  for ( i = 0; i < MAX_TERCETOS; i++) {
+        vectorSaltos[i] = 0;
+    }
 
   escribirInicio(arch);
   generarTabla(arch);
   escribirInicioCodigo(arch);
-  int i;
-    /*printf("Contenido de lista_terceto:\n");
+	
     for (i = 0; i < 175; i++) {
-        printf("Elemento %d:\n", i + 1);
-        printf("  Operador: %d\n", lista_terceto[i].operador);
-        printf("  Op1: %d\n", lista_terceto[i].op1);
-        printf("  Op2: %d\n", lista_terceto[i].op2);
-    }*/
+		if(lista_terceto[i].operador != 0 || lista_terceto[i].op1 != 0 || lista_terceto[i].op2 != 0)
+		{
+			lista_terceto_con_indice[i].operador = lista_terceto[i].operador;
+			lista_terceto_con_indice[i].op1 = lista_terceto[i].op1;
+			lista_terceto_con_indice[i].op2 = lista_terceto[i].op2;
+			lista_terceto_con_indice[i].indice = i+1000;
+		}
+
+    }
 
   for( i=0; i <= ultimo_terceto; i++){
 	//printf("%d\n",lista_terceto[i].operador);
-    switch(lista_terceto[i].operador){
+    switch(lista_terceto_con_indice[i].operador){
       case OP_ASIG:
 	  	asignacion(arch, i);
         break;
@@ -60,31 +104,31 @@ void generarAssembler(){
 		comparacion(arch, i);
         break;
       case BGT:
-        escribirSalto(arch, "JA", lista_terceto[i].op1);
+        escribirSalto(arch, "JA", lista_terceto_con_indice[i].op1);
         break;
       case BGE:
-        escribirSalto(arch, "JAE", lista_terceto[i].op1);
+        escribirSalto(arch, "JAE", lista_terceto_con_indice[i].op1);
         break;
       case BLT:
-        escribirSalto(arch, "JB", lista_terceto[i].op1);
+        escribirSalto(arch, "JB", lista_terceto_con_indice[i].op1);
         break;
       case BLE:
-        escribirSalto(arch, "JBE", lista_terceto[i].op1);
+        escribirSalto(arch, "JBE", lista_terceto_con_indice[i].op1);
         break;
       case BNE:
-        escribirSalto(arch, "JNE", lista_terceto[i].op1);
+        escribirSalto(arch, "JNE", lista_terceto_con_indice[i].op1);
         break;
       case BEQ:
-        escribirSalto(arch, "JE", lista_terceto[i].op1);
+        escribirSalto(arch, "JE", lista_terceto_con_indice[i].op1);
         break;
       case BI:
-        escribirSalto(arch, "JMP", lista_terceto[i].op1);
+        escribirSalto(arch, "JMP", lista_terceto_con_indice[i].op1);
         break;
 	  case END_IF:
-        finIfOWhile(arch, "END_IF");
+        finIfOWhile(arch, "END_IF", i);
         break;
       case ELSE:
-        finIfOWhile(arch, "ELSE");
+        finIfOWhile(arch, "ELSE", i);
         break;
       case CICLO:
         escribirEtiqueta(arch, "CICLO", i);
@@ -120,6 +164,12 @@ void generarAssembler(){
   }
 
   escribirFinal(arch);
+
+  /*for(i = 0; i < 50; i++)
+		{
+			if(vectorSaltos[i] != 0)
+			printf("VECTOR %d -- %d\n",i,vectorSaltos[i]);
+		}*/
   fclose(arch);
 
 }
@@ -160,6 +210,12 @@ void generarTabla(FILE *arch){
 }
 
 void escribirEtiqueta(FILE* arch, char* etiqueta, int n){
+	char str[80];
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[n].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[n].indice);	
+		fprintf(arch, str);
+	}
     fprintf(arch, "%s%d:\n", etiqueta, n+OFFSET);
 }
 
@@ -173,26 +229,25 @@ void escribirSalto(FILE* arch, char* salto, int tercetoDestino){
         system("Pause");
         exit(10);
     }*/
-		sprintf(str, "SALTO%d\n", nroSalto);
-		fprintf(arch, str);
-		strcpy(saltoActual,str);
-		apilar(&pilaSalto,saltoActual);
 
-		//fprintf(arch, "\n");
-        switch( lista_terceto[tercetoDestino - OFFSET].operador ){
-        case ELSE:
-            fprintf(arch, "else");
-            break;
-        case CICLO:
-            fprintf(arch, "while");
-            break;
-        fprintf(arch, "%d\n", tercetoDestino);
-    }
+	sprintf(str, "SALTO%d\n", tercetoDestino);
+	encontrarYEscribirEnPosicionLibre(vectorSaltos, MAX_TERCETOS, tercetoDestino);
+	int i;
+			
+	fprintf(arch, str);
+	strcpy(saltoActual,str);
+		
 }
 void asignacion(FILE* arch, int ind){
-	int destino = lista_terceto[ind].op1;
-	int origen = lista_terceto[ind].op2;
-	
+	int destino = lista_terceto_con_indice[ind].op1;
+	int origen = lista_terceto_con_indice[ind].op2;
+	char str[80];
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[ind].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[ind].indice);	
+		fprintf(arch, str);
+	}
+
 	//Ver tipo de dato
 	if (strcmp(ts[destino].tipoDato, "INT") == 0) {
 		//fprintf(arch, "FLD %s\n", ts[origen].nombre);
@@ -207,17 +262,25 @@ void asignacion(FILE* arch, int ind){
 	fprintf(arch, "\n");
 }
 
-void finIfOWhile(FILE* arch, char* ind){
+void finIfOWhile(FILE* arch, char* ind, int indice){
 	char saltoAssembler[50];
+
+	char str[80];
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[indice].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[indice].indice);	
+		fprintf(arch, str);
+	}
+
 	if (strcmp(ind, "END_IF") == 0) {
-			desapilar(&pilaSalto,saltoAssembler);
-			fprintf(arch, "END_IF\n");
-			fprintf(arch, saltoAssembler);
+			//desapilar(&pilaSalto,saltoAssembler);
+			fprintf(arch, "END_IF:\n");
+			//fprintf(arch, saltoAssembler);
 	}
 		if (strcmp(ind, "ELSE") == 0) {
-			desapilar(&pilaSalto,saltoAssembler);
-			fprintf(arch, "ELSE\n");
-			fprintf(arch, saltoAssembler);
+			//desapilar(&pilaSalto,saltoAssembler);
+			fprintf(arch, "ELSE:\n");
+			//fprintf(arch, saltoAssembler);
 	}
 }
 
@@ -226,9 +289,11 @@ void finIfOWhile(FILE* arch, char* ind){
 void comparacion(FILE* arch, int ind){
 	char str[80];
 	
-    /*sprintf(str, "SALTO%d\n", nroSalto);
-	fprintf(arch, str);
-	strcpy(saltoActual,str);*/
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[ind].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[ind].indice);	
+		fprintf(arch, str);
+	}
 
 	nroSalto++;
 	levantarEnPila(arch, ind);	
@@ -237,14 +302,27 @@ void comparacion(FILE* arch, int ind){
 }
 /** Levanta, suma, y deja en pila */
 void suma(FILE* arch, int ind){
+	char str[80];
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[ind].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[ind].indice);	
+		fprintf(arch, str);
+	}
 	levantarEnPila(arch, ind);
 	fprintf(arch, "FADD\n");
 }
 /** Levanta, revisa si hay dos operadores: Si hay uno, calcula el negativo. Si hay dos, resta y deja en pila*/
 void resta(FILE* arch, int ind){
-	if(lista_terceto[ind].op2==NOOP){
+	char str[80];
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[ind].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[ind].indice);	
+		fprintf(arch, str);
+	}
+
+	if(lista_terceto_con_indice[ind].op2==NOOP){
 		int aux;
-		if((aux = lista_terceto[ind].op1) < OFFSET){ //Es decir si está en la tabla
+		if((aux = lista_terceto_con_indice[ind].op1) < OFFSET){ //Es decir si está en la tabla
 			if (strcmp(ts[aux].tipoDato, "INT") == 0) {
 				fprintf(arch, "FLD %s\n", ts[aux].nombre);
 			} else if (strcmp(ts[aux].tipoDato, "FLOAT") == 0) {
@@ -265,20 +343,39 @@ void resta(FILE* arch, int ind){
 }
 /** Levanta, multiplica, y deja en pila */
 void multiplicacion(FILE* arch, int ind){
+	char str[80];
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[ind].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[ind].indice);	
+		fprintf(arch, str);
+	}
 	levantarEnPila(arch, ind);
 	fprintf(arch, "FMUL\n");
 }
 /** Levanta, divide, si la cuenta era de enteros se asegura de truncar y deja en pila */
-void division(FILE* arch, int ind){ //Mañana reviso, seguro acá distinguimos operación integer de flotante
+void division(FILE* arch, int ind){ 
+	char str[80];
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[ind].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[ind].indice);	
+		fprintf(arch, str);
+	}
 	levantarEnPila(arch, ind);
 	fprintf(arch, "FDIV\n");
 }
 
 /** Asegura que el elemento de la izquierda esté en st1, y el de la derecha en st0 */
 void levantarEnPila(FILE* arch, const int ind){
-	int elemIzq = lista_terceto[ind].op1;
-	int elemDer = lista_terceto[ind].op2;
+	int elemIzq = lista_terceto_con_indice[ind].op1;
+	int elemDer = lista_terceto_con_indice[ind].op2;
 	int izqLevantado = 0;
+
+	char str[80];
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[ind].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[ind].indice);	
+		fprintf(arch, str);
+	}
 	/* Si el elemento no está en pila lo levanta */
 	if(elemIzq < OFFSET){
 			if (strcmp(ts[elemIzq].tipoDato, "INT") == 0) {
@@ -311,7 +408,15 @@ void levantarEnPila(FILE* arch, const int ind){
 }
 
 void write(FILE* arch, int terceto){
-	int ind = lista_terceto[terceto].op1; //Indice de entrada a tabla de simbolos del mensaje a mostrar
+
+	char str[80];
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[terceto].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[terceto].indice);	
+		fprintf(arch, str);
+	}
+
+	int ind = lista_terceto_con_indice[terceto].op1; //Indice de entrada a tabla de simbolos del mensaje a mostrar
 		if (strcmp(ts[ind].tipoDato, "INT") == 0) {
 			fprintf(arch, "displayInteger %s", ts[ind].nombre);
 		} else if (strcmp(ts[ind].tipoDato, "FLOAT") == 0) {
@@ -326,7 +431,14 @@ void write(FILE* arch, int terceto){
 }
 
 void read(FILE* arch, int terceto){
-	int ind = lista_terceto[terceto].op1;
+
+	char str[80];
+	if(encontrarValor(vectorSaltos, lista_terceto_con_indice[terceto].indice ) == 1)
+	{
+		sprintf(str, "SALTO%d:\n", lista_terceto_con_indice[terceto].indice);	
+		fprintf(arch, str);
+	}
+	int ind = lista_terceto_con_indice[terceto].op1;
 	if (strcmp(ts[ind].tipoDato, "INT") == 0) {
 		fprintf(arch, "getInteger %s", ts[ind].nombre);
 	} else if (strcmp(ts[ind].tipoDato, "FLOAT") == 0) {

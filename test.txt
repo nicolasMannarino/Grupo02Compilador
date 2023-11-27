@@ -1,13 +1,7 @@
 #/Prueba declaracion variables\#
 INIT
 {
-a1,a2,a3,l1,l2,l3,r1:INT
-p1:FLOAT
-J3,k4:FLOAT
-var1,var2,var3:INT
-str1:STRING
-str2:STRING
-str2:STRING
+var1, var2, var3,a1,a2,a3:INT
 }
 
 
@@ -16,149 +10,9 @@ var1:=5
 var2:=5
 var3:=5
 
-#/Prueba READ y WRITE\#
-READ (a1)
-READ (a2)
-WRITE ("hola")
-
-#/Prueba condiciones\#
-IF(a3==1)
-{
-    WRITE (a1)
-
-    READ (a1)
-    READ (a1)
-    IF(a2==4)
-    {
-        a1:=4
-    }
-    ELSE
-    {
-        a1:=3
-    }
-
-
-    a1:=2
-}
-
-IF(a1>a2 or a1!=10)
-{
-    a1:=2
-    a2:=2
-}
-
-
-
-IF(a1>a2 or a1!=10)
-{
-    a1:=2
-}
-ELSE
-{
-    a2:=2
-}
-
-
-
-IF(a1>a2 AND a1!=10)
-{
-    a1:=4
-}
-
-IF(a1>a2 AND a1!=10)
-{
-    a1:=4
-}
-ELSE
-{
-    a1:=2
-}
-
-
 IF(a1>a2)
 {
-    a1:=4
+    a1:=2
+    a2:=2
 }
 
-
-IF(!a1>a2)
-{
-    a1:=4
-}
-ELSE
-{
-    a1:=6
-}
-
-#/Comentario de prueba\#
-#/Comentario #/de\# prueba\#
-
-#/Prueba ciclo\#
-CICLO(J3 <= k4)
-{
-    J3:= k4
-    k4:= J3
-}
-
-CICLO(!J3 <= k4)
-{
-    J3:= k4
-    k4:= J3
-}
-
-
-
-#/Prueba ciclo y condiciones\#
-CICLO(J3 <= k4)
-{
-IF(a3==1)
-{
-    p1:=33.5
-}
-
-IF(a2==588)
-{
-    p1:=100
-}
-
-J3:= k4
-k4:= J3
-}
-
-
-
-
-#/Probando cota de enteros\#
-#/a1:=32767\#
-a1:=32766
-#/a2:=-32768\#
-a2:=-32767
-
-#/Probando cota de float\#
-#/p1:=0.00000000000000000000000000000000000001\#
-#/p1:=0.0000000000000000000000000000000000001\#
-#/p1:=350000000000000000000000000000000000000.0\#
-#/p1:=340000000000000000000000000000000000000.0\#
-
-
-#/Probando cota de String\#
-#/str1:="Cadena que contiene mas caracteres de los permitidos"\#
-str2:="Cadena correcta"
-
-#/Probando RESTO\#
-a1 := a1%10
-
-#/Probando DIV\#
-a1 := a1/10
-
-#/Probando TIMER\#
-Timer(5, WRITE ("Hello World"))
-
-#/Probando ESTACONTENIDO\#
-IF(EstaContenido("Homoplato", "plato"))
-{
-    a1 := 4
-}
-
-READ (a1)
-WRITE ("hola")

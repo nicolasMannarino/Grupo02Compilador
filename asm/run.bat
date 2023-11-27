@@ -1,7 +1,7 @@
 PATH=C:\TASM;
 
 tasm numbers.asm
-tasm ejemplo.asm
+tasm Final.asm
 tlink ejemplo.obj numbers.obj
 ejemplo.exe
 del ejemplo.obj 
